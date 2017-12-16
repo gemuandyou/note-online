@@ -1,0 +1,80 @@
+<div class="body body-mine-add">
+  <div class="left">
+    <!-- compass grid -->
+    <div class="compass module">
+      <div>
+        <div class="div-1"></div>
+      </div>
+      <div class="viewer-top" #top (drop)="drop($event, top)" (dragover)="allowDrop($event)" draggable="true" (dragstart)="drag($event, top)">
+        <div class="div-2"></div>
+      </div>
+      <div>
+        <div class="div-3"></div>
+      </div>
+      <div class="viewer-left" #left (click)="hideViewer=!hideViewer;" (drop)="drop($event, left)" (dragover)="allowDrop($event)"
+        draggable="true" (dragstart)="drag($event, left)">
+        <div class="div-4 viewer-grid">看</div>
+      </div>
+      <div class="div-5" (click)="hideEditor=!hideEditor;">编</div>
+      <div class="viewer-right" #right (drop)="drop($event, right)" (dragover)="allowDrop($event)" draggable="true" (dragstart)="drag($event, right)">
+        <div class="div-6"></div>
+      </div>
+      <div>
+        <div class="div-7"></div>
+      </div>
+      <div>
+        <div class="div-8"></div>
+      </div>
+      <div>
+        <div class="div-9"></div>
+      </div>
+    </div>
+    <!-- operation button -->
+    <div class="btns">
+      <div (click)="openSaveModal();">保存</div>
+      <div (click)="openTagModal();">标签</div>
+      <div (click)="previewNote();">预览</div>
+      <div (click)="openDeleteModal();" class="btn-red">删除</div>
+    </div>
+  </div>
+  <!-- note preview -->
+  <div class="note-preview-content" *ngIf="needPreview">
+    <ul>
+      <li *ngFor="let struct of previewStructures" (click)="positionPreview(struct.dom);">
+        <span retract="{{struct.tier}}"></span> {{struct.name}}
+      </li>
+    </ul>
+  </div>
+  <!-- editor and viewer -->
+  <div class="content">
+    <div class="viewer" #notesViewer [ngClass]="{'hidden': hideViewer, 'width-full': hideEditor}">
+    </div>
+    <div class="editor" contenteditable="plaintext-only" #notesEditor (keyup)="changeEdit($event)" [ngClass]="{'hidden': hideEditor, 'width-full': hideViewer}">
+    </div>
+  </div>
+
+  <!-- 保存弹出框 -->
+  <app-modal-box [identify]="'save-note'" (showEvent)="initSaveModal($event)">
+    <input type="text" class="form-input" placeholder="填写标题" [(ngModel)]="noteTitle" style="width: calc(100% - 1em); line-height: 20px; margin: 0;">
+  </app-modal-box>
+  <!-- 删除确认弹出框 -->
+  <app-modal-box [identify]="'delete-note'" (showEvent)="initDeleteModal($event)">
+      <span>好不容易些的东西，真的忍心删除吗？好好检查一下，看看是不点错了呀！</span>
+  </app-modal-box>
+  <!-- 设置标签弹出框 -->
+  <app-modal-box [identify]="'tag-note'" (showEvent)="initTagModal($event)">
+    <div class="tag edit-tag" *ngFor="let tagName of noteTags" (click)="removeTag(tagName)">{{tagName}}
+      <span>x</span>
+    </div>
+    <div class="set-tag">
+      <input type="text" class="form-input" placeholder="添加标签" #addTag (keyup.enter)="chooseEnter(addTag)" (keyup.arrowDown)="chooseTag($event, addTag, 'down');"
+        (keyup.arrowUp)="chooseTag($event, addTag, 'up');">
+      <span class="tag-tip">回车搜索相似标签，上下键选中后回车添加标签。若没有选则，再次回车则新建标签。</span>
+      <div class="tags-choose">
+        <ol>
+          <li *ngFor="let chooseTag of chooseTags; index as i;" [ngClass]="{'active': chooseIndex - 1 === i}">{{chooseTag.tagName}}</li>
+        </ol>
+      </div>
+    </div>
+  </app-modal-box>
+</div>

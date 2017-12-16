@@ -1,0 +1,60 @@
+.modal {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: #141A1E;
+  text-align: center;
+  transition: background-color .2s linear;
+  background-color: transparent;
+}
+
+.modal-open {
+  background-color: rgba(20, 26, 30, 0.74);
+}
+
+.modal-dialog {
+  top: 10%;
+  opacity: 1;
+  width: 80%;
+  display: inline-block;
+  position: relative;
+  box-shadow: 0 0 0.5rem 0.1rem grey;
+  background-color: ghostwhite;
+}
+
+.modal-header {
+  line-height: 2.8rem;
+  text-align: left;
+  padding: 0 1rem 0 1rem;
+  background-color: #3b8cde;
+  color: white;
+}
+
+.modal-header > i {
+  font-size: 1.3rem;
+  float: right;
+  line-height: 2.8rem;
+  transition: color 0.2s linear;
+}
+
+.modal-header > i:hover {
+  color: #000;
+}
+
+.modal-body {
+  padding: 1rem;
+  text-align: left;
+}
+
+.modal-footer {
+  text-align: right;
+  padding-right: 1rem;
+  line-height: 2rem;
+  border-top: 1px solid #d5d5d5;
+}
+
+.modal-footer button {
+  margin-left: 20px;
+  width: 100px;
+}

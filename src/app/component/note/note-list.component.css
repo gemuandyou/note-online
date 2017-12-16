@@ -1,0 +1,5 @@
+.public-list {
+  display: inline-block;
+  width: calc(80% - 50px);
+  margin: 10px 20px 0 calc(20% + 40px);
+}

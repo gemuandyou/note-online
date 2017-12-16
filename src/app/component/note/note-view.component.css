@@ -1,0 +1,54 @@
+.note-view {
+  margin: 60px 18% 0 18%;
+  box-shadow: 0px 0px 13px grey;
+  padding: 10px;
+}
+
+.title {
+  color: #888;
+  text-align: center;
+}
+
+.info {
+  text-align: right;
+  font-size: 12px;
+  color: #B0B0B0;
+}
+
+.author {
+  display: inline-block;
+}
+
+.time {
+  display: inline-block;
+}
+
+.preview-btn {
+  position: fixed;
+  top: 123px;
+  left: 50px;
+  width: 100px;
+  text-align: center;
+}
+
+.note-preview-content {
+  position: fixed;
+  top: 60px;
+  margin-left: 18%;
+  width: calc(100% - 130px);
+  z-index: 10;
+  text-align: left;
+  max-height: 20rem;
+  overflow: auto;
+}
+
+.note-preview-content ul {
+  margin: 0;
+  background-color: rgba(61, 63, 34, 0.69);
+  color: #fcfff0;
+}
+
+.note-preview-content ul li:hover {
+  background-color: #0095ff;
+  cursor: pointer;
+}

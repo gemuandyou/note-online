@@ -1,0 +1,42 @@
+<div class="user-regist">
+  <form class="user-form">
+    <h2>登陆</h2>
+    <div class="form-item">
+      <label for="name">名字</label>
+      <input type="text" class="form-input" [(ngModel)]="loginUser.name" name="name" required placeholder="who?"/>
+    </div>
+    <div class="form-item">
+      <label for="password">密码</label>
+      <input type="password" class="form-input" [(ngModel)]="loginUser.password" name="password" required placeholder="your password"/>
+    </div>
+    <input type="button" class="btn" value="登陆" (click)="login();" />
+</form>
+  <form class="user-form left-border">
+    <h2>注册</h2>
+    <div class="form-item">
+      <label for="name">名字</label>
+      <input type="text" class="form-input" [(ngModel)]="registUser.name" name="name" required placeholder="what's 妖 name?"/>
+    </div>
+    <div class="form-item">
+      <label for="password">密码</label>
+      <input type="password" class="form-input" [(ngModel)]="registUser.password" name="password" required placeholder="your password"/>
+    </div>
+    <div class="form-item">
+      <label for="password1">确认密码</label>
+      <input type="password" class="form-input" [(ngModel)]="confirmPassword" name="password1" required placeholder="confirm your password?"/>
+    </div>
+    <div class="form-item">
+      <label for="age">年龄</label>
+      <input type="text" class="form-input" [(ngModel)]="registUser.age" name="age" required placeholder="who old are you?"/>
+    </div>
+    <div class="form-item">
+      <label for="gender">性别</label>
+      <input type="text" class="form-input" [(ngModel)]="registUser.gender" name="gender" required placeholder="参考:/攻/受/未知"/>
+    </div>
+    <div class="form-item">
+      <label for="phone">手机号</label>
+      <input type="text" class="form-input" [(ngModel)]="registUser.phone" name="phone" required placeholder="方便我半夜悄悄勾引"/>
+    </div>
+    <input type="button" class="btn" value="Go!" (click)="regist();" />    
+  </form>
+</div>

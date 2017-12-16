@@ -1,0 +1,26 @@
+<div class="body body-mine">
+  <div class="add-btn" routerLink="/note-editor">
+    <span>添加笔记/日志</span>
+  </div>
+  <div class="to-top" onclick="document.getElementsByTagName('html')[0].scrollTop=0;">置顶</div>
+  <div class="classify">
+    <div class="tag-list module">
+      <div class="tag" (click)="conditionTag()">全部</div>
+      <div class="tag" *ngFor="let tag of noteTags" (click)="conditionTag(tag.id)" [ngClass]="{'active': conditionTags.indexOf(tag.id) !== -1}">{{tag.tagName}}</div>
+    </div>
+    <div class="data-list module">
+      <div class="tag" (click)="conditionDate()">全部</div>
+      <div class="tag" *ngFor="let date of dates" (click)="conditionDate(date.createDate)">{{date.createDate}}</div>
+    </div>
+  </div>
+
+  <div class="note-list">
+    <div class="module" *ngFor="let note of notes" (click)="linkToEdit(note)">
+      <div class="module-author">{{note.author}}</div>
+      <div class="module-date">{{note.createDate | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
+      <div class="module-title">{{note.noteTitle}}</div>
+      <div class="module-introduction">{{note.noteIntroduction}}</div>
+    </div>
+  </div>
+
+</div>

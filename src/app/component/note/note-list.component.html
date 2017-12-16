@@ -1,0 +1,21 @@
+<div class="body body-public">
+  <div class="classify">
+    <div class="tag-list module">
+      <div class="tag" (click)="conditionTag()">全部</div>
+      <div class="tag" *ngFor="let tag of noteTags" (click)="conditionTag(tag.id)" 
+        [ngClass]="{'active': conditionTags.indexOf(tag.id) !== -1}">{{tag.tagName}}</div>
+    </div>
+    <div class="user-list module">
+      <div class="tag" (click)="conditionUser()">全部</div>
+      <div class="tag" *ngFor="let user of users" (click)="conditionUser(user.name)" [ngClass]="{'active': conditionUserName === user.name}">{{user.name}}</div>
+    </div>
+  </div>
+  <div class="note-list">
+    <div class="module" *ngFor="let note of notes" (click)="linkToView(note)">
+      <div class="module-author">{{note.author}}</div>
+      <div class="module-date">{{note.createDate | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
+      <div class="module-title">{{note.noteTitle}}</div>
+      <div class="module-introduction">{{note.noteIntroduction}}</div>
+    </div>
+  </div>
+</div>

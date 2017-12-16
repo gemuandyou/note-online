@@ -1,0 +1,452 @@
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { NoteService } from '../../service/note.service';
+import { TagService } from '../../service/tag.service';
+import { RollUtil } from '../../util/roll.util';
+import { ParseStructure, NoteStructure } from '../../util/parse-struct';
+import { Cookie } from '../../util/cookie';
+import { ModalBoxComponent } from '../modalbox/modalbox.component';
+import { Note } from './note';
+import { Tag } from './tag';
+
+@Component({
+    selector: 'app-note-editor',
+    templateUrl: './note-editor.component.html',
+    styleUrls: ['./note-editor.component.css', '../../common.css'],
+    providers: [NoteService, TagService, ModalBoxComponent]
+})
+export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+
+    title = 'note-editor';
+
+    @ViewChild('notesEditor') notesEditor;
+    @ViewChild('notesViewer') notesViewer;
+    @ViewChild('addTag') addTag;
+    notesEditorEle: any;
+    notesViewerEle: any;
+    roll: RollUtil;
+    srcDom: any; // 被拖动的DOM
+    // 笔记元数据
+    noteId: number; // 笔记ID
+    noteTitle: string; // 笔记标题
+    noteTags: string[] = []; // 笔记标签，用“|”分割
+    currentNoteUrl: string; // 当前笔记路径（编辑时）
+    chooseTags: Tag[] = []; // 选择的标签列表
+    chooseIndex: number = 0; // 选择的标签索引
+    lastTagInputValue: string; // 上次输入的标签名，用于判断是否是第二次敲回车
+    previewStructures: NoteStructure[]; // 笔记预览
+    needPreview: boolean = false; // 是否显示笔记预览
+
+    saveModalBoxComp: ModalBoxComponent;
+    tagModalBoxComp: ModalBoxComponent;
+    deleteModalBoxComp: ModalBoxComponent;
+
+    constructor(
+        private noteService: NoteService,
+        private tagService: TagService,
+        private elementRef: ElementRef,
+        private activateRoute: ActivatedRoute,
+        private router: Router
+    ) {
+    }
+
+    ngOnInit(): void {
+        this.noteId = this.activateRoute.snapshot.queryParams.noteId;
+        this.currentNoteUrl = this.activateRoute.snapshot.queryParams.noteUrl;
+        this.noteTitle = this.activateRoute.snapshot.queryParams.noteTitle;
+        // 加载笔记内容
+        if (this.currentNoteUrl) { // 渲染编辑的内容
+            this.noteService.readFromMd(this.currentNoteUrl, true).subscribe((res) => {
+                if (res.data) {
+                    this.notesEditorEle = this.notesEditor.nativeElement;
+                    this.notesEditorEle.innerText = res.data;
+                    this.noteService.renderToHtml(res.data).subscribe((res1) => {
+                        this.notesViewerEle = this.notesViewer.nativeElement;
+                        const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
+                        this.notesViewerEle.innerHTML = res1.data + style;
+                        // this.saveTempNote(this);
+                    });
+                }
+            });
+        } else {
+            const username = decodeURI(decodeURI(Cookie.getCookie('un')));
+            if (!username) {
+                return;
+            }
+            this.noteService.readFromMd(username + '-temp.md', false).subscribe((res) => {
+                if (res.data) {
+                    this.notesEditorEle = this.notesEditor.nativeElement;
+                    this.notesEditorEle.innerText = res.data;
+                    this.noteService.renderToHtml(res.data).subscribe((res1) => {
+                        this.notesViewerEle = this.notesViewer.nativeElement;
+                        const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
+                        this.notesViewerEle.innerHTML = res1.data + style;
+                    });
+                }
+            });
+        }
+    }
+
+    ngAfterViewInit(): void {
+        this.notesEditorEle = this.notesEditor.nativeElement;
+        this.notesViewerEle = this.notesViewer.nativeElement;
+
+        // 开启轮训，来保存文本到文件中
+        this.roll = new RollUtil(5000);
+        this.roll.start(this.saveTempNote, this);
+    }
+
+    ngOnDestroy(): void {
+        if (this.roll) {
+            this.roll.end();
+        }
+    }
+
+    /**
+     * 保存模态框初始化完毕后触发的对象
+     * @param modalBoxComp 模态框模块对象
+     */
+    initSaveModal(modalBoxComp: ModalBoxComponent) {
+        this.saveModalBoxComp = modalBoxComp;
+        this.saveModalBoxComp.confirmEvent.subscribe(() => {
+            this.saveNote();
+        });
+    }
+
+    /**
+     * 保存模态框初始化完毕后触发的对象
+     * @param modalBoxComp 模态框模块对象
+     */
+    initDeleteModal(modalBoxComp: ModalBoxComponent) {
+        this.deleteModalBoxComp = modalBoxComp;
+        this.deleteModalBoxComp.confirmEvent.subscribe(() => {
+            this.deleteNote();
+        });
+    }
+
+    /**
+     * 设置标签模态框初始化完毕后触发的对象
+     * @param modalBoxComp 模态框模块对象
+     */
+    initTagModal(modalBoxComp: ModalBoxComponent) {
+        this.tagModalBoxComp = modalBoxComp;
+        this.tagModalBoxComp.confirmEvent.subscribe(() => {
+            this.saveNoteTagRel();
+        });
+    }
+
+    /**
+     * 编辑器中内容变动
+     * @param event 事件
+     */
+    changeEdit(event): void {
+        const editor = this.notesEditorEle.innerText;
+        if (!editor) {
+            return;
+        }
+        this.noteService.renderToHtml(editor).subscribe((res) => {
+            const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
+            this.notesViewerEle.innerHTML = res.data + style;
+            this.saveTempNote(this);
+        });
+    }
+
+    /**
+     * 保存文本内容到临时文件
+     */
+    saveTempNote(obj): void {
+        const editor = obj.notesEditorEle.innerText;
+        const username = decodeURI(decodeURI(Cookie.getCookie('un')));
+        if (!editor && !username) {
+            return;
+        }
+        obj.noteService.saveToMd(username + '-temp.md', editor).subscribe((res) => {
+            // console.log(res);
+        });
+    }
+
+    /**
+     * 保存文本内容到文件
+     */
+    saveNote(): void {
+        const editor = this.notesEditorEle.innerText;
+        const username = decodeURI(Cookie.getCookie('un'));
+        if (!editor || !username) {
+            return;
+        }
+        let path = username + '/' + new Date().getTime() + '.md';
+        if (this.currentNoteUrl) {
+            path = username + this.currentNoteUrl.substring(this.currentNoteUrl.lastIndexOf('/'));
+        }
+        this.noteService.saveToMd(path, editor).subscribe((res) => {
+            const noteIntroduction = this.notesViewer.nativeElement.innerText.substring(0, 100) + '...';
+            if (this.currentNoteUrl) { // 更新笔记
+                this.noteService.modifyToMysql(this.noteTitle, res, noteIntroduction, editor, username).subscribe((res1) => {
+                    console.log(res1);
+                });
+            } else { // 添加笔记
+                this.noteService.saveToMysql(this.noteTitle, res, noteIntroduction, editor, username).subscribe((res1) => {
+                    console.log(res1);
+                });
+            }
+        });
+    }
+
+    /**
+     * 删除笔记
+     */
+    deleteNote(): void {
+        const username = decodeURI(Cookie.getCookie('un'));
+        if (!username) {
+            return;
+        }
+        this.noteService.deleteNote(this.noteId, username, this.currentNoteUrl).subscribe((res) => {
+            if (res && res.data && res.data.results) {
+                this.router.navigate(['/note-mine']);
+            }
+        });
+    }
+
+    /**
+     * 预览笔记
+     * <p>每次点击重新生成笔记结构</p>
+     */
+    previewNote(): void {
+        const parseStructure = new ParseStructure();
+        this.previewStructures = parseStructure.parseStructure(this.notesViewer.nativeElement);
+        this.needPreview = !this.needPreview;
+    }
+
+    /**
+     * 预览定位
+     * @param dom
+     */
+    positionPreview(dom: HTMLElement) {
+        const notesViewEle = this.notesViewer.nativeElement;
+        notesViewEle.scrollTop = dom.offsetTop;
+        this.needPreview = false;
+    }
+
+    /**
+     * 打开保存模态框
+     */
+    openSaveModal(): void {
+        this.saveModalBoxComp.openModal('保存笔记', { 'width': '38%' });
+    }
+
+    /**
+     * 打开删除模态框
+     */
+    openDeleteModal(): void {
+        this.deleteModalBoxComp.openModal('确认删除', { 'width': '38%' });
+    }
+
+    /**
+     * 打开设置标签模态框
+     */
+    openTagModal(): void {
+        this.chooseTags = [];
+        this.addTag.nativeElement.value = '';
+        this.noteService.getNoteTags(this.noteId).subscribe((res) => {
+            if (res && res.data && res.data.results) {
+                this.noteTags = [];
+                res.data.results.forEach((tag, index) => {
+                    this.noteTags.push(tag.tagName);
+                });
+            }
+        });
+        this.tagModalBoxComp.openModal('笔记标签', { 'width': '83%' });
+    }
+
+    /**
+     * 选择标签
+     * @param dom 输入框元素
+     */
+    chooseEnter(dom: any): void {
+        if (this.chooseTags && this.chooseTags[this.chooseIndex - 1]) { // 已选择标签
+            this.noteTags.push(this.chooseTags[this.chooseIndex - 1].tagName);
+            this.chooseIndex = 0;
+        } else { // 未选择标签
+            if (dom.value) {
+                // 根据输入内容搜索标签
+                this.tagService.list(dom.value).subscribe((res) => {
+                    if (res && res.data && res.data.results[0]) {
+                        this.chooseTags = res.data.results;
+                        // 检查是否存在此标签
+                        if (dom.value === this.lastTagInputValue) {
+                            this.tagService.get(dom.value).subscribe((res1) => {
+                                if (res1 && res1.data && !res1.data.results[0]) {
+                                    this.noteTags.push(dom.value);
+                                    // 保存标签
+                                    this.saveTag(dom);
+                                }
+                            });
+                        }
+                    }
+                    if (res && res.data && !res.data.results[0] && dom.value === this.lastTagInputValue) {
+                        this.noteTags.push(dom.value);
+                        // 保存标签
+                        this.saveTag(dom);
+                    }
+                    this.lastTagInputValue = dom.value;
+                });
+            }
+        }
+    }
+
+    /**
+     * 新增标签
+     * @param dom 输入框DOM元素
+     */
+    saveTag(dom: any): void {
+        const tag = new Tag();
+        tag.tagName = dom.value;
+        const username = decodeURI(decodeURI(Cookie.getCookie('un')));
+        tag.creator = username;
+        this.tagService.save(tag).subscribe(() => {
+            dom.value = '';
+        });
+    }
+
+    /**
+     * 建立当前笔记和标签的关系
+     */
+    saveNoteTagRel(): void {
+        const tags = [];
+        const tmp = {};
+        this.noteTags.forEach((value, index) => {
+            if (!tmp[value]) {
+                tags.push(value);
+                tmp[value] = index;
+            }
+        });
+        this.noteService.relNoteAndTagFromMysql(this.noteId, tags).subscribe((res) => {
+            console.log(res);
+        });
+    }
+
+    /**
+     * 选择标签
+     * @param ev 事件
+     * @param dom DOM元素
+     * @param direction down:向下选择;up:向上选择
+     */
+    chooseTag(ev: Event, dom: any, direction: string): void {
+        switch (direction) {
+            case 'down':
+                this.chooseIndex = this.chooseIndex >= this.chooseTags.length ? this.chooseIndex : this.chooseIndex + 1;
+                break;
+            case 'up':
+                this.chooseIndex = this.chooseIndex <= 0 ? this.chooseIndex : this.chooseIndex - 1;
+                break;
+        }
+        // 将光标移动到最后
+        const valTmp = dom.value;
+        dom.value = '';
+        dom.focus();
+        dom.value = valTmp;
+    }
+
+    /**
+     * 移除指定标签
+     * @param tagName 标签名
+     */
+    removeTag(tagName: string): void {
+        this.noteTags.forEach((tag, index) => {
+            if (tag === tagName) {
+                this.noteTags.splice(index, 1);
+            }
+        });
+    }
+
+    // ======拖拽布局罗盘======
+
+    /**
+     * 允许拖拽，取消默认事件
+     * @param ev 拖拽事件
+     */
+    allowDrop(ev): void {
+        ev.preventDefault();
+    }
+    /**
+     * 拖动
+     * @param ev 拖拽事件
+     * @param targetDom 拖到的DOM
+     */
+    drag(ev, targetDom) {
+        this.srcDom = targetDom;
+        ev.dataTransfer.setData('text/plain', targetDom.innerHTML);
+    }
+    /**
+     * 拖动释放
+     * @param ev 拖拽释放事件
+     * @param targetDom 拖到的DOM
+     */
+    drop(ev, targetDom) {
+        ev.preventDefault();
+        if (this.srcDom !== targetDom) {
+            if (!this.srcDom.getAttribute('class') || !this.srcDom.getElementsByClassName('viewer-grid')) {
+                return;
+            }
+            const gridDom = this.srcDom.getElementsByClassName('viewer-grid')[0];
+            if (gridDom && gridDom.getAttribute('class') && gridDom.getAttribute('class').indexOf('viewer-grid') !== -1) {
+                this.srcDom.innerHTML = targetDom.innerHTML;
+                targetDom.innerHTML = ev.dataTransfer.getData('text/plain');
+                const ele = this.elementRef.nativeElement;
+                const viewer: HTMLDivElement = ele.querySelectorAll('.viewer').item(0);
+                const editor: HTMLDivElement = ele.querySelectorAll('.editor').item(0);
+                const content: HTMLDivElement = ele.querySelectorAll('.content').item(0);
+                if (targetDom.getAttribute('class')) {
+                    if (targetDom.getAttribute('class').indexOf('viewer-top') !== -1) { // viewer on top
+                        // content style
+                        content.style.height = 'calc(100% - 60px)';
+                        // viewer style
+                        viewer.style.width = 'calc(100% - 20px)';
+                        viewer.style.height = '50%';
+                        viewer.style.padding = '10px 10px 0 10px';
+                        viewer.style.overflow = 'auto';
+                        // editor style
+                        editor.style.width = 'calc(100% - 20px)';
+                        editor.style.height = 'calc(50% - 30px)';
+                        editor.style.overflow = 'auto';
+                    }
+                    if (targetDom.getAttribute('class').indexOf('viewer-left') !== -1) { // viewr on left
+                        // content style
+                        content.style.height = '';
+                        content.style.width = 'calc(100% - 130px)';
+                        // viewer style
+                        viewer.style.width = 'calc(50% - 20px)';
+                        viewer.style.height = '';
+                        viewer.style.padding = '10px 10px 0 10px';
+                        viewer.style.overflow = '';
+                        viewer.style.setProperty('float', 'left');
+                        // editor style
+                        editor.style.width = 'calc(50% - 30px)';
+                        editor.style.height = '';
+                        editor.style.minHeight = '100px';
+                        editor.style.overflow = '';
+                        editor.style.setProperty('float', 'left');
+                    }
+                    if (targetDom.getAttribute('class').indexOf('viewer-right') !== -1) { // viewer on right
+                        // content style
+                        content.style.height = '';
+                        content.style.width = 'calc(100% - 130px)';
+                        // editor style
+                        editor.style.width = 'calc(50% - 20px)';
+                        editor.style.height = '';
+                        editor.style.padding = '10px 10px 0 10px';
+                        editor.style.overflow = '';
+                        editor.style.setProperty('float', 'right');
+                        // viewer style
+                        viewer.style.width = 'calc(50% - 30px)';
+                        viewer.style.height = '';
+                        viewer.style.minHeight = '100px';
+                        viewer.style.overflow = '';
+                        viewer.style.setProperty('float', 'right');
+                    }
+                }
+            }
+        }
+    }
+
+}

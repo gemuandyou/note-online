@@ -1,0 +1,79 @@
+.header {
+  height: 40px;
+  width: 100%;
+  line-height: 40px;
+  padding: 10px 0;
+  display: flex;
+  position: fixed;
+  top: 0;
+  background: url('/assets/images/big_eye.png'), url('/assets/images/have-a-nice-day.png');
+  background-repeat: no-repeat;
+  background-color: #3b8cde;
+  animation: bgInfinite 30s linear infinite;
+}
+
+@keyframes bgInfinite {
+  0% {
+    background: url('/assets/images/big_eye.png') top 0 left 0, url('/assets/images/have-a-nice-day.png') top 30px right 0;
+    background-repeat: no-repeat;
+    background-color: #3b8cde;
+  }
+  50% {
+    background: url('/assets/images/big_eye.png') top 0 left 100%, url('/assets/images/have-a-nice-day.png') top 30px right 100%;
+    background-repeat: no-repeat;
+    background-color: #3b8cde;
+  }
+  55% {
+    background: url('/assets/images/big_eye.png') top 30px left 100%, url('/assets/images/have-a-nice-day.png') top 0 right 100%;
+    background-repeat: no-repeat;
+    background-color: #3b8cde;
+  }
+  95% {
+    background: url('/assets/images/big_eye.png') top 30px left 0, url('/assets/images/have-a-nice-day.png') top 0 right 0;
+    background-repeat: no-repeat;
+    background-color: #3b8cde;
+  }
+  100% {
+    background: url('/assets/images/big_eye.png') top 0 left 0, url('/assets/images/have-a-nice-day.png') top 30px right 0;
+    background-repeat: no-repeat;
+    background-color: #3b8cde;
+  }
+}
+
+.header .smile-logo {
+  font-size: 40px;
+  font-family: fantasy;
+  margin: 0 20px;
+  transform: skew(49deg, -29deg);
+  top: 20px;
+  position: relative;
+}
+
+.navigation {
+  display: inline-block;
+  margin-left: 50px;
+}
+
+.navigation-ul {
+  display: flex;
+  list-style: none !important;
+  padding: 0;
+  margin: 0;
+}
+
+.navigation-ul li {
+  padding: 0 20px;
+  border-radius: 8px;
+  cursor: default;
+  font-size: 16px;
+  color: white;
+  outline: 0;
+}
+
+.navigation-ul li:hover {
+  color: #cacaca;
+}
+
+.navigation-ul .active {
+  background-color: rgba(148, 170, 211, 0.58);
+}

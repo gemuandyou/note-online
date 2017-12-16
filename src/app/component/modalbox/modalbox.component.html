@@ -1,0 +1,19 @@
+<div #modalBox>
+  <div class="modal modal-open" *ngIf="show" (click)="closeModal()">
+    <div class="modal-dialog" [ngStyle]="style" (click)="$event.stopPropagation();">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title">{{title}}</span>
+          <i class="fa fa-times" aria-hidden="true" (click)="closeModal()"></i>
+        </div>
+        <div class="modal-body">
+          <ng-content></ng-content>
+        </div>
+        <div class="modal-footer">
+          <button type="button" hidden class="btn confirm" (click)="confirmModal()">确定</button>
+          <button type="button" hidden class="btn cancel" (click)="closeModal()">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
