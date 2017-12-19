@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } fr
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NoteService } from '../../service/note.service';
 import { TagService } from '../../service/tag.service';
+import { FileService } from '../../service/file.service';
 import { RollUtil } from '../../util/roll.util';
 import { ParseStructure, NoteStructure } from '../../util/parse-struct';
 import { Cookie } from '../../util/cookie';
@@ -13,7 +14,7 @@ import { Tag } from './tag';
     selector: 'app-note-editor',
     templateUrl: './note-editor.component.html',
     styleUrls: ['./note-editor.component.css', '../../common.css'],
-    providers: [NoteService, TagService, ModalBoxComponent]
+    providers: [NoteService, TagService, FileService, ModalBoxComponent]
 })
 export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -44,6 +45,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(
         private noteService: NoteService,
         private tagService: TagService,
+        private fileService: FileService,
         private elementRef: ElementRef,
         private activateRoute: ActivatedRoute,
         private router: Router
@@ -54,11 +56,11 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.noteId = this.activateRoute.snapshot.queryParams.noteId;
         this.currentNoteUrl = this.activateRoute.snapshot.queryParams.noteUrl;
         this.noteTitle = this.activateRoute.snapshot.queryParams.noteTitle;
+        this.notesEditorEle = this.notesEditor.nativeElement;
         // 加载笔记内容
         if (this.currentNoteUrl) { // 渲染编辑的内容
             this.noteService.readFromMd(this.currentNoteUrl, true).subscribe((res) => {
                 if (res.data) {
-                    this.notesEditorEle = this.notesEditor.nativeElement;
                     this.notesEditorEle.innerText = res.data;
                     this.noteService.renderToHtml(res.data).subscribe((res1) => {
                         this.notesViewerEle = this.notesViewer.nativeElement;
@@ -75,7 +77,6 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             this.noteService.readFromMd(username + '-temp.md', false).subscribe((res) => {
                 if (res.data) {
-                    this.notesEditorEle = this.notesEditor.nativeElement;
                     this.notesEditorEle.innerText = res.data;
                     this.noteService.renderToHtml(res.data).subscribe((res1) => {
                         this.notesViewerEle = this.notesViewer.nativeElement;
@@ -85,6 +86,11 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
             });
         }
+        // 监听粘贴事件
+        this.notesEditorEle.addEventListener('paste', (e) => {
+            const pasteItems = e.clipboardData.items;
+            this.pasteHandle(pasteItems);
+        });
     }
 
     ngAfterViewInit(): void {
@@ -449,4 +455,70 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
+    /**
+     * 粘贴内容
+     * @param pasteItems
+     */
+    pasteHandle(pasteItems): void {
+        const pasteSel = window.getSelection();
+        // 在编译器中 获取光标位置
+        const pasteRng = pasteSel.getRangeAt(0);
+        const beforeEc = pasteRng.endContainer;
+        const beforeEo = pasteRng.endOffset;
+        const pasteRngTmp = document.createRange();
+        pasteRngTmp.setStart(beforeEc, beforeEo);
+        for (const item of pasteItems) {
+            // HTML内容
+            if (item.kind === 'string' && 'text/html' === item.type) {
+                // TODO 粘贴的是HTML
+            }
+            // 普通文本
+            if (item.kind === 'string' && 'text/plain' === item.type) {
+                // TODO 粘贴的是普通的字符串
+            }
+            // 文件
+            if (item.kind === 'file' && /image\//.test(item.type)) { // 粘贴图片
+                const blob = item.getAsFile();
+                const reader = new FileReader();
+                // reader.onload = (event) => {
+                //     const eventTarget: any = event.target;
+
+                //     // 在编辑器中 获取光标位置，直接生成图片
+                //     // const sel = window.getSelection();
+                //     // const rng = sel.getRangeAt(0);
+                //     // rng.deleteContents();
+                //     // const imgEle = document.createElement('img');
+                //     // imgEle.src = eventTarget.result;
+                //     // rng.insertNode(imgEle);
+                //     // rng.collapse(true);
+                //     // sel.removeAllRanges();
+                //     // sel.addRange(rng);
+
+                // };
+                // 在编译器中 获取光标位置，生成图片标签
+                const sel = window.getSelection();
+                let rng = sel.getRangeAt(0);
+                rng.deleteContents();
+
+                let cpImgUrl: String = ''; // 粘贴过来的图片，解析后生成路径
+
+                // 保存截图
+                const username = decodeURI(decodeURI(Cookie.getCookie('un')));
+                this.fileService.upload('/note-online/' + username, blob).subscribe((resp) => {
+                    if (resp.status === 200) {
+                        cpImgUrl = resp._body;
+                        console.log(cpImgUrl);
+                        const imgTagTextEle = document.createTextNode('![](' + cpImgUrl + ')');
+                        rng.insertNode(imgTagTextEle);
+                        rng = rng.cloneRange();
+                        rng.collapse(false);
+                        sel.removeAllRanges();
+                        sel.addRange(rng);
+                    }
+                });
+                reader.readAsDataURL(blob);
+                break;
+            }
+        }
+    }
 }
