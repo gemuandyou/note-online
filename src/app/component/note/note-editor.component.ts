@@ -507,7 +507,6 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.fileService.upload('/note-online/' + username, blob).subscribe((resp) => {
                     if (resp.status === 200) {
                         cpImgUrl = resp._body;
-                        console.log(cpImgUrl);
                         const imgTagTextEle = document.createTextNode('![](' + cpImgUrl + ')');
                         rng.insertNode(imgTagTextEle);
                         rng = rng.cloneRange();
