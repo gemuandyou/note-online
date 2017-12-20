@@ -60,6 +60,8 @@
   position: fixed;
   top: 115px;
   left: 0;
+  height: calc(100% - 154px);
+  overflow: auto;
 }
 
 .tag {
