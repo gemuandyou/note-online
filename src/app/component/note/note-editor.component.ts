@@ -504,7 +504,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
                 // 保存截图
                 const username = decodeURI(decodeURI(Cookie.getCookie('un')));
-                this.fileService.upload('/note-online/' + username, blob).subscribe((resp) => {
+                const newFile = new File([blob], new Date().getTime() + blob.name);
+                this.fileService.upload('/note-online/' + username, newFile).subscribe((resp) => {
                     if (resp.status === 200) {
                         cpImgUrl = resp._body;
                         const imgTagTextEle = document.createTextNode('![](' + cpImgUrl + ')');

@@ -16,7 +16,9 @@ export class FileService extends BaseService {
         const formData = new FormData();
         formData.append('filePath', filePath);
         formData.append('file', file);
-        return this.http.post(`/fileserver-api/api/uploadForm`, formData);
+        return this.http.post(`/fileserver-api/api/uploadForm`, formData, {
+            responseType: 'text'
+        });
     }
 
 }
