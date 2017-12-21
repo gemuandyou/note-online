@@ -10,6 +10,7 @@
   background-repeat: no-repeat;
   background-color: #3b8cde;
   animation: bgInfinite 30s linear infinite;
+  z-index: 1;
 }
 
 @keyframes bgInfinite {
