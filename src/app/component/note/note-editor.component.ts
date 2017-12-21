@@ -98,8 +98,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.notesViewerEle = this.notesViewer.nativeElement;
 
         // 开启轮训，来保存文本到文件中
-        this.roll = new RollUtil(5000);
-        this.roll.start(this.saveTempNote, this);
+        // this.roll = new RollUtil(5000);
+        // this.roll.start(this.saveTempNote, this);
     }
 
     ngOnDestroy(): void {
@@ -152,7 +152,25 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.noteService.renderToHtml(editor).subscribe((res) => {
             const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
-            this.notesViewerEle.innerHTML = res.data + style;
+            this.notesViewerEle.innerHTML = res.data + style + '<div class="soon"></div>';
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            const scriptText = document.createTextNode('(()=>{' +
+                'var domEditor = document.getElementsByClassName("editor")[0];' +
+                'var domViewer = document.getElementsByClassName("viewer")[0];' +
+                'if (domEditor && domViewer && domEditor.scrollTop > (domEditor.scrollHeight - 1000)) {' +
+                    'domEditor.scrollTop = domEditor.scrollHeight;' +
+                    'domViewer.scrollTop = domViewer.scrollHeight;' +
+                '}' +
+            '})();');
+            script.appendChild(scriptText);
+            const handle = setInterval(() => {
+                if (this.notesViewerEle.querySelectorAll('.soon')) {
+                    this.notesViewerEle.appendChild(script);
+                    clearInterval(handle);
+                }
+                console.warn(this.notesViewerEle.querySelectorAll('.soon'));
+            }, 100);
             this.saveTempNote(this);
         });
     }
