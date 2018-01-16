@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { NoteService } from '../../service/note.service';
@@ -16,15 +16,17 @@ import { User } from '../user/user';
     styleUrls: ['./note-list.component.css', '../../common.css'],
     providers: [NoteService, UserService, TagService, DatePipe]
 })
-export class NoteListComponent implements OnInit {
+export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     title = 'note-list';
-    page: Page = new Page(1, -1);
+    page: Page = new Page(1, 10);
     notes: Note[] = [];
     users: User[] = [];
     noteTags: Tag[] = [];
     conditionTags: number[] = [];
     conditionUserName: string;
+    conditionCreateDate: string;
+    isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router, private datePipe: DatePipe) { }
@@ -37,6 +39,29 @@ export class NoteListComponent implements OnInit {
                 this.users = res.data.results;
             }
         });
+    }
+
+    ngAfterViewInit(): void {
+        window.addEventListener('scroll', this.windowScroll.bind(this));
+    }
+
+    ngOnDestroy(): void {
+        window.removeEventListener('scroll', this.windowScroll.bind(this));
+    }
+
+    /**
+     * window的滚动事件
+     * @param ev 滚动事件
+     */
+    windowScroll(ev): void {
+        const htmlDom = document.getElementsByTagName('html')[0];
+        const scrollTop = htmlDom.scrollTop;
+        const scrollHeight = htmlDom.scrollHeight;
+        const clientHeight = htmlDom.clientHeight;
+        if (scrollHeight <= scrollTop + clientHeight) {
+            this.page.pageNo = (this.page.pageNo || 0) + 1;
+            this.getList();
+        }
     }
 
     /**
@@ -61,9 +86,20 @@ export class NoteListComponent implements OnInit {
      * @param createDate 日期
      */
     getList(createDate?: string): void {
-        this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, createDate).subscribe((res) => {
+        if (createDate) {
+            this.conditionCreateDate = createDate;
+        }
+        this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, this.conditionCreateDate).subscribe((res) => {
             if (res && res.data && res.data.results) {
-                this.notes = res.data.results;
+                if (this.isResetCondition) {
+                    this.notes = res.data.results;
+                    this.isResetCondition = false;
+                } else {
+                    this.notes = this.notes.concat(res.data.results);
+                }
+                if (res.data.results.length <= 0) {
+                    this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                }
             }
         });
     }
@@ -73,6 +109,9 @@ export class NoteListComponent implements OnInit {
      * @param username 用户名
      */
     conditionUser(username: string): void {
+        if (this.conditionCreateDate !== username) {
+            this.isResetCondition = true;
+        }
         this.conditionUserName = username;
         this.getList();
     }
@@ -82,10 +121,18 @@ export class NoteListComponent implements OnInit {
      * @param tagId 标签ID
      */
     conditionTag(tagId: number): void {
+        const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];
         } else {
-            this.conditionTags.push(tagId);
+            if (this.conditionTags.indexOf(tagId) !== -1) {
+                this.conditionTags.splice(this.conditionTags.indexOf(tagId), 1);
+            } else {
+                this.conditionTags.push(tagId);
+            }
+        }
+        if (tagsLen !== this.conditionTags.length) {
+            this.isResetCondition = true;
         }
         this.getList();
     }

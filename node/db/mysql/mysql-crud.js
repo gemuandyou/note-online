@@ -97,11 +97,12 @@ module.exports = {
         sql += 'and DATE_FORMAT(create_date, \'%Y-%m-%d\') = ? ';
         params.push(createDate);
       }
-      if (start && size && size !== -1) {
+      sql += 'ORDER BY create_date desc ';
+      if (start != undefined && start >= 0 && size && size !== -1) {
         sql += 'limit ?,? ';
-        params.push(start).push(size);
+        params.push(start);
+        params.push(size);
       }
-      sql += 'ORDER BY create_date desc';
       connection.query(sql, params, function (error, results, fields) {
         if (error) {
           callback(error, results, fields);
@@ -117,7 +118,7 @@ module.exports = {
    * 获取指定人的笔记
    * @param author 作者
    */
-  getAuthorNotes: function (author, tags, createDate, callback) {
+  getAuthorNotes: function (start, size, author, tags, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT DISTINCT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
         'node_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
@@ -131,7 +132,12 @@ module.exports = {
         sql += 'and DATE_FORMAT(create_date, \'%Y-%m-%d\') = ? ';
         params.push(createDate);
       }
-      sql += 'ORDER BY create_date desc';
+      sql += 'ORDER BY create_date desc ';
+      if (start != undefined && start >= 0 && size && size !== -1) {
+        sql += 'limit ?,? ';
+        params.push(start);
+        params.push(size);
+      }
       connection.query(sql, params, function (error, results, fields) {
         if (error) {
           callback(error, results, fields);

@@ -10,10 +10,10 @@ export class NoteService extends BaseService {
 
     /**
      * 获取所有笔记列表，时间排序
+     * @param page 分页对象
      * @param author 笔记作者
      * @param tags: 标签列表
      * @param createDate 创建日期。格式:yyyy-MM-dd
-     * @param page 分页对象
      */
     allMds(page: Page, author?: string, tags?: number[], createDate?: string): Observable<any> {
         let tagsCondition = '';
@@ -111,8 +111,9 @@ export class NoteService extends BaseService {
      * @param author 作者
      * @param tags 标签ID列表
      * @param createDate 创建日期
+     * @param page 分页对象
      */
-    listByAuthorFromMysql(author: string, tags?: number[], createDate?: string): Observable<any> {
+    listByAuthorFromMysql(author: string, tags?: number[], createDate?: string, page?: Page): Observable<any> {
         let tagsCondition = '';
         if (tags && tags.length > 0) {
             let condition = '(';
@@ -124,7 +125,9 @@ export class NoteService extends BaseService {
         return this.http.post(`/node-api/note/listByAuthorFromMysql`, {
             author: author,
             tags: tagsCondition,
-            createDate: createDate
+            createDate: createDate,
+            pageStart: page.pageStart,
+            pageSize: page.pageSize
         });
     }
 
