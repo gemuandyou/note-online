@@ -58,7 +58,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         const scrollTop = htmlDom.scrollTop;
         const scrollHeight = htmlDom.scrollHeight;
         const clientHeight = htmlDom.clientHeight;
-        if (scrollHeight <= scrollTop + clientHeight) {
+        if (scrollHeight <= scrollTop + clientHeight && scrollTop !== 0) {
             this.page.pageNo = (this.page.pageNo || 0) + 1;
             this.getList();
         }

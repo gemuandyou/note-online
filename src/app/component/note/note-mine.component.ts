@@ -28,7 +28,9 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
-        private router: Router) { }
+        private router: Router) {
+            console.log(this.page);
+        }
 
     ngOnInit(): void {
         this.username = decodeURI(Cookie.getCookie('un'));
@@ -70,7 +72,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
         const scrollTop = htmlDom.scrollTop;
         const scrollHeight = htmlDom.scrollHeight;
         const clientHeight = htmlDom.clientHeight;
-        if (scrollHeight <= scrollTop + clientHeight) {
+        if (scrollHeight <= scrollTop + clientHeight && scrollTop !== 0) {
             this.page.pageNo = (this.page.pageNo || 0) + 1;
             this.getList();
         }
