@@ -26,7 +26,7 @@
 .preview-btn {
   position: fixed;
   top: 123px;
-  left: 50px;
+  left: 0;
   width: 100px;
   text-align: center;
 }

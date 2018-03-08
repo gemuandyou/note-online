@@ -169,7 +169,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.notesViewerEle.appendChild(script);
                     clearInterval(handle);
                 }
-                console.warn(this.notesViewerEle.querySelectorAll('.soon'));
+                // console.warn(this.notesViewerEle.querySelectorAll('.soon'));
             }, 100);
             this.saveTempNote(this);
         });
