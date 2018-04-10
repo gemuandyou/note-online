@@ -69,14 +69,20 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param note 笔记对象
      */
     linkToView(note: Note): void {
-        this.router.navigate(['/note-view'], {
-            queryParams: {
-                url: note.noteUrl,
-                author: note.author,
-                title: note.noteTitle,
-                time: this.datePipe.transform(note.createDate, 'yyyy-MM-dd HH:mm:ss')
-            }
-        });
+        // this.router.navigate(['/note-view'], {
+        //     queryParams: {
+        //         url: note.noteUrl,
+        //         author: note.author,
+        //         title: note.noteTitle,
+        //         time: this.datePipe.transform(note.createDate, 'yyyy-MM-dd HH:mm:ss')
+        //     }
+        // });
+        this.router.navigate(['/note-view', {
+            url: note.noteUrl,
+            author: note.author,
+            title: note.noteTitle,
+            time: this.datePipe.transform(note.createDate, 'yyyy-MM-dd HH:mm:ss')
+        }]);
     }
 
     /**

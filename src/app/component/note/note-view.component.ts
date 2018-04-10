@@ -27,10 +27,15 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private noteService: NoteService, private activateRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.currentNoteUrl = this.activateRoute.snapshot.queryParams.url;
-    this.noteAuthor = this.activateRoute.snapshot.queryParams.author;
-    this.noteCreateTime = this.activateRoute.snapshot.queryParams.time;
-    this.noteTitle = this.activateRoute.snapshot.queryParams.title;
+    // this.currentNoteUrl = this.activateRoute.snapshot.queryParams.url;
+    // this.noteAuthor = this.activateRoute.snapshot.queryParams.author;
+    // this.noteCreateTime = this.activateRoute.snapshot.queryParams.time;
+    // this.noteTitle = this.activateRoute.snapshot.queryParams.title;
+    let params = this.activateRoute.params["value"];
+    this.currentNoteUrl = params["url"];
+    this.noteAuthor = params["author"];
+    this.noteCreateTime = params["time"];
+    this.noteTitle = params["title"];
     if (this.currentNoteUrl) {
       this.noteService.readFromMd(this.currentNoteUrl, true).subscribe((res) => {
         if (res.data) {

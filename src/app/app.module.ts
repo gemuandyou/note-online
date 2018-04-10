@@ -4,7 +4,7 @@ import { HttpModule } from '@angular/http';
 import { Routes, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
 import { NodeInterceptor } from './interceptor/node.interceptor';
 import { NoteModule } from './component/note/note.module';
 import { UserModule } from './component/user/user.module';
@@ -40,7 +40,8 @@ const routes: Routes = [
   },
   {
     provide: LocationStrategy,
-    useClass: HashLocationStrategy,
+    // useClass: HashLocationStrategy,
+    useClass: PathLocationStrategy
   }],
   bootstrap: [AppComponent]
 })

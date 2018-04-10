@@ -29,8 +29,8 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router) {
-            console.log(this.page);
-        }
+        console.log(this.page);
+    }
 
     ngOnInit(): void {
         this.username = decodeURI(Cookie.getCookie('un'));
@@ -101,7 +101,8 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param note 笔记对象
      */
     linkToEdit(note: Note): void {
-        this.router.navigate(['/note-editor'], { queryParams: { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id } });
+        // this.router.navigate(['/note-editor'], { queryParams: { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id } });
+        this.router.navigate(['/note-editor', { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id }]);
     }
 
     /**h

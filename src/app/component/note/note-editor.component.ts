@@ -53,9 +53,13 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.noteId = this.activateRoute.snapshot.queryParams.noteId;
-        this.currentNoteUrl = this.activateRoute.snapshot.queryParams.noteUrl;
-        this.noteTitle = this.activateRoute.snapshot.queryParams.noteTitle;
+        // this.noteId = this.activateRoute.snapshot.queryParams.noteId;
+        // this.currentNoteUrl = this.activateRoute.snapshot.queryParams.noteUrl;
+        // this.noteTitle = this.activateRoute.snapshot.queryParams.noteTitle;
+        let params = this.activateRoute.params["value"];
+        this.noteId = params["noteId"];
+        this.currentNoteUrl = params["noteUrl"];
+        this.noteTitle = params["noteTitle"];
         this.notesEditorEle = this.notesEditor.nativeElement;
         // 加载笔记内容
         if (this.currentNoteUrl) { // 渲染编辑的内容
@@ -159,10 +163,10 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 'var domEditor = document.getElementsByClassName("editor")[0];' +
                 'var domViewer = document.getElementsByClassName("viewer")[0];' +
                 'if (domEditor && domViewer && domEditor.scrollTop > (domEditor.scrollHeight - 1000)) {' +
-                    'domEditor.scrollTop = domEditor.scrollHeight;' +
-                    'domViewer.scrollTop = domViewer.scrollHeight;' +
+                'domEditor.scrollTop = domEditor.scrollHeight;' +
+                'domViewer.scrollTop = domViewer.scrollHeight;' +
                 '}' +
-            '})();');
+                '})();');
             script.appendChild(scriptText);
             const handle = setInterval(() => {
                 if (this.notesViewerEle.querySelectorAll('.soon')) {
