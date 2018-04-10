@@ -7,6 +7,9 @@ export class SignUtil {
 	 * @deprecated
 	 */
   static decodingUrlSign(code: string): string {
+    if (!code) {
+        return;
+    }
     return code.replace('gemu+equal-sign+yifan', '=')
                .replace('gemu+semicolon+yifan', ';')
                .replace('gemu+and+yifan', '&')
@@ -20,6 +23,9 @@ export class SignUtil {
 	 * @return 编码后的字符串
 	 */
   static encodingUrlSign(code: string): string {
+    if (!code) {
+        return;
+    }
     return code.replace('=', 'gemu+equal-sign+yifan')
                .replace(';', 'gemu+semicolon+yifan')
                .replace('&', 'gemu+and+yifan')
