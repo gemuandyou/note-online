@@ -1,7 +1,7 @@
 var pool = require('./mysql-connect');
 
 var userSelect = 'id, name, password, gender, age, phone, login_address loginAddress, create_date createDate, last_date lastDate';
-var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, note_content nodeContent, author, private, create_date createDate, modify_date modifyDate';
+var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, note_content noteContent, author, private, create_date createDate, modify_date modifyDate';
 var tagSelect = 'id, tag_name tagName, creator, create_date createDate, modify_date modifyDate';
 
 module.exports = {
@@ -39,7 +39,7 @@ module.exports = {
    */
   modifyNote: function (noteTitle, noteUrl, noteIntroduction, noteContent, author, callback) {
     pool.getConnection(function (err, connection) {
-      var sql = 'UPDATE `note` SET note_title=?, note_introduction=?, node_content=?, author=?, modify_date=now() WHERE note_url=?';
+      var sql = 'UPDATE `note` SET note_title=?, note_introduction=?, note_content=?, author=?, modify_date=now() WHERE note_url=?';
       var params = [noteTitle, noteIntroduction, noteContent, author, noteUrl];
       connection.query(sql, params, function (error, results) {
         if (error) {
@@ -82,7 +82,7 @@ module.exports = {
   getAllPublicNotes: function (start, size, author, tags, searchKey, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'note_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content noteContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';
@@ -126,7 +126,7 @@ module.exports = {
   getAuthorNotes: function (start, size, author, tags, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT DISTINCT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'note_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content noteContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';
