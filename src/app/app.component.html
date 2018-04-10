@@ -8,6 +8,7 @@
       <li routerLink="/note-mine" routerLinkActive="active">我的笔记</li>
     </ul>
   </nav>
+  <input #searchKey class="search-input" placeholder="想找啥啊？" (keydown.enter)="toSearch(searchKey.value)" />
 </div>
 
 <router-outlet></router-outlet>

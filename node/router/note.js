@@ -13,6 +13,7 @@ module.exports = function (app) {
             req.body.pageSize,
             req.body.author,
             req.body.tags,
+            req.body.searchKey,
             req.body.createDate, (error, results, fields) => {
                 if (error) {
                     res.status(500).send(error);

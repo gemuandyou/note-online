@@ -14,8 +14,9 @@ export class NoteService extends BaseService {
      * @param author 笔记作者
      * @param tags: 标签列表
      * @param createDate 创建日期。格式:yyyy-MM-dd
+     * @param searchKey 全文搜索关键字
      */
-    allMds(page: Page, author?: string, tags?: number[], createDate?: string): Observable<any> {
+    allMds(page: Page, author?: string, tags?: number[], createDate?: string, searchKey?: string): Observable<any> {
         let tagsCondition = '';
         if (tags && tags.length > 0) {
             let condition = '(';
@@ -28,6 +29,7 @@ export class NoteService extends BaseService {
             author: author,
             tags: tagsCondition,
             createDate: createDate,
+            searchKey: searchKey,
             pageStart: page.pageStart,
             pageSize: page.pageSize
         });

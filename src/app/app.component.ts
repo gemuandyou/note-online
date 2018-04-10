@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { SignUtil } from './util/sign.util';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
+    constructor(private router: Router) { }
+
+    toSearch(searchKey: string): void {
+        searchKey = encodeURI(searchKey);
+        searchKey = SignUtil.encodingUrlSign(searchKey);
+        location.href = '/note-list;searchKey=' + searchKey;
+    }
 
 }

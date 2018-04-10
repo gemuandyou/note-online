@@ -3,7 +3,7 @@ CREATE TABLE `note` (
 `note_title`  varchar(50) NOT NULL COMMENT '笔记标题' ,
 `note_url`  text NOT NULL COMMENT '笔记存储地址' ,
 `note_introduction`  text NULL COMMENT '笔记简介' ,
-`node_content`  text NULL COMMENT '笔记内容（md格式）' ,
+`note_content`  text NULL COMMENT '笔记内容（md格式）' ,
 `author`  varchar(50) NULL COMMENT '笔记作者' ,
 `private`  tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否共享。0：共享；1：不共享。默认为0.',
 `create_date`  datetime NOT NULL COMMENT '创建时间' ,

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NoteService } from '../../service/note.service';
 import { UserService } from '../../service/user.service';
 import { TagService } from '../../service/tag.service';
@@ -9,6 +9,7 @@ import { Page } from '../../util/page';
 import { Note } from './note';
 import { Tag } from './tag';
 import { User } from '../user/user';
+import { SignUtil } from '../../util/sign.util';
 
 @Component({
     selector: 'app-note-list',
@@ -27,11 +28,14 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     conditionUserName: string;
     conditionCreateDate: string;
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
+    searchKey: string; // 搜索条件
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
-        private router: Router, private datePipe: DatePipe) { }
+        private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) { }
 
     ngOnInit(): void {
+        let params = this.activateRoute.params['value'];
+        this.searchKey = SignUtil.decodingUrlSign(params['searchKey']);
         this.getList();
         this.getTags();
         this.userService.userList().subscribe((res) => {
@@ -95,7 +99,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (createDate) {
             this.conditionCreateDate = createDate;
         }
-        this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, this.conditionCreateDate).subscribe((res) => {
+        this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, this.conditionCreateDate, this.searchKey).subscribe((res) => {
             if (res && res.data && res.data.results) {
                 if (this.isResetCondition) {
                     this.notes = res.data.results;

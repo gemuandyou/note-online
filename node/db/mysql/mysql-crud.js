@@ -1,7 +1,7 @@
 var pool = require('./mysql-connect');
 
 var userSelect = 'id, name, password, gender, age, phone, login_address loginAddress, create_date createDate, last_date lastDate';
-var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, node_content nodeContent, author, private, create_date createDate, modify_date modifyDate';
+var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, note_content nodeContent, author, private, create_date createDate, modify_date modifyDate';
 var tagSelect = 'id, tag_name tagName, creator, create_date createDate, modify_date modifyDate';
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
    */
   saveNote: function (noteTitle, noteUrl, noteIntroduction, noteContent, author, callback) {
     pool.getConnection(function (err, connection) {
-      var sql = 'INSERT INTO `note`(note_title, note_url, note_introduction, node_content, author, create_date) VALUES (?,?,?,?,?,now())';
+      var sql = 'INSERT INTO `note`(note_title, note_url, note_introduction, note_content, author, create_date) VALUES (?,?,?,?,?,now())';
       var params = [noteTitle, noteUrl, noteIntroduction, noteContent, author];
       connection.query(sql, params, function (error, results) {
         if (error) {
@@ -79,10 +79,10 @@ module.exports = {
    * @param start 起始位置偏移量
    * @param size 要获取的记录数。-1表示全部
    */
-  getAllPublicNotes: function (start, size, author, tags, createDate, callback) {
+  getAllPublicNotes: function (start, size, author, tags, searchKey, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'node_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';
@@ -96,6 +96,11 @@ module.exports = {
       if (createDate) {
         sql += 'and DATE_FORMAT(create_date, \'%Y-%m-%d\') = ? ';
         params.push(createDate);
+      }
+      if (searchKey) {
+        sql += 'and (note_title like ? or note_content like ?) ';
+        params.push('%' + searchKey + '%');
+        params.push('%' + searchKey + '%');
       }
       sql += 'ORDER BY create_date desc ';
       if (start != undefined && start >= 0 && size && size !== -1) {
@@ -121,7 +126,7 @@ module.exports = {
   getAuthorNotes: function (start, size, author, tags, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT DISTINCT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'node_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content nodeContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';

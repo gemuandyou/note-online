@@ -78,3 +78,24 @@
 .navigation-ul .active {
   background-color: rgba(148, 170, 211, 0.58);
 }
+
+.search-input {
+  position: fixed;
+  right: 0;
+  width: 20%;
+  transition: width 0.45s;
+  -moz-transition: width 0.5s; /* Firefox 4 */
+  -webkit-transition: width 0.5s; /* Safari and Chrome */
+  -o-transition: width 0.5s; /* Opera */
+  font-size: 0.8rem;
+  line-height: 0.8rem;
+  height: 2rem;
+  border: 1px solid #ececec;
+  border-radius: 1rem;
+  padding: 0 1rem;
+  outline: none;
+}
+
+.search-input:focus {
+  width: 38%;
+}
