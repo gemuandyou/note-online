@@ -119,7 +119,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param username 用户名
      */
     conditionUser(username: string): void {
-        if (this.conditionCreateDate !== username) {
+        if (this.conditionUserName !== username || !username) {
             this.isResetCondition = true;
         }
         this.conditionUserName = username;
@@ -134,6 +134,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];
+            this.isResetCondition = true; 
         } else {
             if (this.conditionTags.indexOf(tagId) !== -1) {
                 this.conditionTags.splice(this.conditionTags.indexOf(tagId), 1);
@@ -142,7 +143,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
         if (tagsLen !== this.conditionTags.length) {
-            this.isResetCondition = true;
+            this.isResetCondition = true; 
         }
         this.getList();
     }

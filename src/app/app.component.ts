@@ -12,9 +12,13 @@ export class AppComponent {
     constructor(private router: Router) { }
 
     toSearch(searchKey: string): void {
-        searchKey = encodeURI(searchKey);
-        searchKey = SignUtil.encodingUrlSign(searchKey);
-        location.href = '/note-list;searchKey=' + searchKey;
+        if (searchKey) {
+            searchKey = encodeURI(searchKey);
+            searchKey = SignUtil.encodingUrlSign(searchKey);
+            location.href = '/note-list;searchKey=' + searchKey;
+        } else {
+            location.href = '/note-list';
+        }
     }
 
 }
