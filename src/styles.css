@@ -2,8 +2,6 @@
 @import '~highlightjs/styles/default.css';
 
 html {
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 body {

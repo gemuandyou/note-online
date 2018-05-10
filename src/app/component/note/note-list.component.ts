@@ -29,9 +29,23 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     conditionCreateDate: string;
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
     searchKey: string; // 搜索条件
+    isPc: boolean = true; // 是否是PC端
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
-        private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) { }
+        private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) {
+        // 判断浏览器类型，区分移动端和PC端
+        var style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.type = 'text/css';
+        let isAndroid = navigator.appVersion.match(/android/gi);
+        let isIPhone = navigator.appVersion.match(/iphone/gi);
+        let isIPad = navigator.appVersion.match(/iPad/gi);
+        this.isPc = !isAndroid && !isIPhone && !isIPad;
+        if (!this.isPc) {
+            style.href = 'assets/style/note-list.mobile.css';
+        }
+        document.head.appendChild(style);
+    }
 
     ngOnInit(): void {
         let params = this.activateRoute.params['value'];
@@ -134,7 +148,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];
-            this.isResetCondition = true; 
+            this.isResetCondition = true;
         } else {
             if (this.conditionTags.indexOf(tagId) !== -1) {
                 this.conditionTags.splice(this.conditionTags.indexOf(tagId), 1);
@@ -143,7 +157,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
         if (tagsLen !== this.conditionTags.length) {
-            this.isResetCondition = true; 
+            this.isResetCondition = true;
         }
         this.getList();
     }

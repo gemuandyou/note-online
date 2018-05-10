@@ -8,12 +8,12 @@
     <span style="font-size: 14px; color: #ccc;">I am loadding...</span>
   </div>
 </div>
-<div (click)="previewNote();" class="btn preview-btn">预览</div>
 <!-- note preview -->
-<div class="note-preview-content" *ngIf="needPreview" (scroll)="preventScroll($event);">
+<div class="note-preview-content" (scroll)="preventScroll($event);">
   <ul>
-    <li *ngFor="let struct of previewStructures" (click)="positionPreview(struct.dom);">
-      <span retract="{{struct.tier}}"></span> {{struct.name}}
+    <li *ngFor="let struct of previewStructures" (click)="positionPreview(struct.dom);" class="space-{{struct.tier}}">
+      <!-- <span retract="{{struct.tier}}"></span>  -->
+      {{struct.name}}
     </li>
   </ul>
 </div>

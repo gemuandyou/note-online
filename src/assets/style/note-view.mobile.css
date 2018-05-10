@@ -1,0 +1,14 @@
+.note-preview-content {
+  display: none;
+}
+
+.note-view {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.note-view .viewer {
+  padding-left: 6px;
+  padding-right: 6px;
+  font-size: 0.8rem !important;
+}

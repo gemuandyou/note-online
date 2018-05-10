@@ -1,0 +1,15 @@
+.classify {
+  width: 100% !important;
+  margin: 0 !important;
+  top: 60px !important;
+  position: initial !important;
+}
+
+.note-list {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.module {
+  font-size: 0.875rem !important;
+}
