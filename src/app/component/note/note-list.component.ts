@@ -132,7 +132,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * 根据用户条件查询用户列表
      * @param username 用户名
      */
-    conditionUser(username: string): void {
+    conditionUser(username?: string): void {
         if (this.conditionUserName !== username || !username) {
             this.isResetCondition = true;
         }
@@ -144,7 +144,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * 根据标签条件查询用户列表
      * @param tagId 标签ID
      */
-    conditionTag(tagId: number): void {
+    conditionTag(tagId?: number): void {
         const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];

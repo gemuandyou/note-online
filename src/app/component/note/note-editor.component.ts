@@ -23,6 +23,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('notesEditor') notesEditor;
     @ViewChild('notesViewer') notesViewer;
     @ViewChild('addTag') addTag;
+    hideViewer: boolean; // 是否隐藏预览
+    hideEditor: boolean; // 是否隐藏编辑
     notesEditorEle: any;
     notesViewerEle: any;
     roll: RollUtil;

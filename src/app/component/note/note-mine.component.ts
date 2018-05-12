@@ -109,7 +109,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
      * 根据日期查询这个人的笔记列表
      * @param date 日期
      */
-    conditionDate(date: string): void {
+    conditionDate(date?: string): void {
         if (this.conditionDateField !== date) {
             this.isResetCondition = true;
         }
@@ -121,7 +121,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
      * 根据日期查询这个人的笔记列表
      * @param tagId 标签名
      */
-    conditionTag(tagId: number): void {
+    conditionTag(tagId?: number): void {
         const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];
