@@ -54,6 +54,12 @@
   font-weight: bold;
 }
 
+.preview-active {
+  color: #c74d00;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 .space-0 {
   padding-left: 0.4rem;
 }

@@ -24,6 +24,7 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     previewStructures: NoteStructure[]; // 笔记预览
     needPreview: boolean = false; // 是否显示笔记预览
     isPc: boolean = true; // 是否是PC端
+    activeNum: number = -1; // 当前内容的预览标题序号
 
     constructor(private noteService: NoteService, private activateRoute: ActivatedRoute) {
         // 判断浏览器类型，区分移动端和PC端
@@ -67,6 +68,17 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        window.addEventListener("scroll", (ev) => {
+            this.activeNum = -1;
+            this.previewStructures.forEach(preview => {
+                if (preview && preview.dom && (preview.dom.offsetTop - 60) < window.scrollY) {
+                    this.activeNum++;
+                    console.count("遍历预览标题，显示高亮");
+                } else {
+                    return;
+                }
+            });
+        });
     }
 
     ngOnDestroy(): void {
