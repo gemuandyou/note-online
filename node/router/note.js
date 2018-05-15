@@ -68,7 +68,7 @@ module.exports = function (app) {
         if (req.body && req.body.data) {
             path = fh.writeToMd(req.body.fileName, req.body.data);
         }
-        res.send(path);
+        res.json({data: path});
     });
 
     /**

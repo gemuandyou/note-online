@@ -211,11 +211,11 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.noteService.saveToMd(path, editor).subscribe((res) => {
             const noteIntroduction = this.notesViewer.nativeElement.innerText.substring(0, 100) + '...';
             if (this.currentNoteUrl) { // 更新笔记
-                this.noteService.modifyToMysql(this.noteTitle, res, noteIntroduction, editor, username).subscribe((res1) => {
+                this.noteService.modifyToMysql(this.noteTitle, res.data, noteIntroduction, editor, username).subscribe((res1) => {
                     console.log(res1);
                 });
             } else { // 添加笔记
-                this.noteService.saveToMysql(this.noteTitle, res, noteIntroduction, editor, username).subscribe((res1) => {
+                this.noteService.saveToMysql(this.noteTitle, res.data, noteIntroduction, editor, username).subscribe((res1) => {
                     console.log(res1);
                 });
             }
