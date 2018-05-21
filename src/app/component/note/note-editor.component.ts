@@ -156,6 +156,15 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!editor) {
             return;
         }
+
+        this.saveTempNote(editor);
+
+        // 仅仅输入回车后才会执行下面的渲染HTML操作，这样是为了提高性能
+        // 不过这样需要在保存前输入一个回车，不然可能会影响预览的展示
+        if (13 != event.keyCode) {
+            return;
+        }
+
         this.noteService.renderToHtml(editor).subscribe((res) => {
             const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
             this.notesViewerEle.innerHTML = res.data + style + '<div class="soon"></div>';
@@ -177,20 +186,18 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
                 // console.warn(this.notesViewerEle.querySelectorAll('.soon'));
             }, 100);
-            this.saveTempNote(this);
         });
     }
 
     /**
      * 保存文本内容到临时文件
      */
-    saveTempNote(obj): void {
-        const editor = obj.notesEditorEle.innerText;
+    saveTempNote(text: string): void {
         const username = decodeURI(decodeURI(Cookie.getCookie('un')));
-        if (!editor && !username) {
+        if (!text && !username) {
             return;
         }
-        obj.noteService.saveToMd(username + '-temp.md', editor).subscribe((res) => {
+        this.noteService.saveToMd(username + '-temp.md', text).subscribe((res) => {
             // console.log(res);
         });
     }
@@ -199,6 +206,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
      * 保存文本内容到文件
      */
     saveNote(): void {
+        // TODO 渲染HTML后保存，这里为了性能，省略此步骤，只需在保存前在编辑中输入回车即可
+
         const editor = this.notesEditorEle.innerText;
         const username = decodeURI(Cookie.getCookie('un'));
         if (!editor || !username) {
