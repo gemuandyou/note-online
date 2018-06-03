@@ -164,7 +164,23 @@ export class NoteService extends BaseService {
      * @param tagId 标签ID
      */
     removeNoteTagRel(noteId: number, tagId: number): Observable<any> {
-        return this.http.post(`/node-api/note/note/removeNoteTagRel`, { noteId: noteId, tagId: tagId });
+        return this.http.post(`/node-api/note/removeNoteTagRel`, { noteId: noteId, tagId: tagId });
+    }
+
+    /**
+     * 公开指定笔记
+     * @param noteId 笔记ID
+     */
+    publish(noteId: number): Observable<any> {
+        return this.http.post(`/node-api/note/publish`, { noteId: noteId });
+    }
+
+    /**
+     * 取消公开指定笔记
+     * @param noteId 笔记ID
+     */
+    unpublish(noteId: number): Observable<any> {
+        return this.http.post(`/node-api/note/unpublish`, { noteId: noteId });
     }
 
 }

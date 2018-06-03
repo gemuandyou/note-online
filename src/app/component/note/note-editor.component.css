@@ -16,6 +16,10 @@
   background-color: red;
 }
 
+.left .btns .btn-violet {
+  background: hsl(258, 68%, 54%);
+}
+
 .left .btns>div {
   background: hsl(210, 68%, 54%);
   text-align: center;

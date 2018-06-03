@@ -7,4 +7,5 @@ export class Note {
   author?: string;
   createDate: Date;
   modifyDate?: Date;
+  isme?: boolean;
 }

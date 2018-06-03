@@ -32,6 +32,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     // 笔记元数据
     noteId: number; // 笔记ID
     noteTitle: string; // 笔记标题
+    notePublish: boolean; // 笔记是否公开
     noteTags: string[] = []; // 笔记标签，用“|”分割
     currentNoteUrl: string; // 当前笔记路径（编辑时）
     chooseTags: Tag[] = []; // 选择的标签列表
@@ -62,6 +63,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.noteId = params['noteId'];
         this.currentNoteUrl = params['noteUrl'];
         this.noteTitle = params['noteTitle'];
+        this.notePublish = params['isme'] == 0;
         this.notesEditorEle = this.notesEditor.nativeElement;
         // 加载笔记内容
         if (this.currentNoteUrl) { // 渲染编辑的内容
@@ -553,5 +555,23 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 break;
             }
         }
+    }
+
+    /**
+     * 公开笔记
+     */
+    publish(): void {
+        this.noteService.publish(this.noteId).subscribe(() => {
+            this.notePublish = true;
+        });
+    }
+
+    /**
+     * 取消公开笔记
+     */
+    unpublish(): void {
+        this.noteService.unpublish(this.noteId).subscribe(() => {
+            this.notePublish = false;
+        });
     }
 }

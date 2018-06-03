@@ -34,6 +34,8 @@
       <div (click)="openSaveModal();">保存</div>
       <div (click)="openTagModal();">标签</div>
       <div (click)="previewNote();">预览</div>
+      <div *ngIf="!notePublish" (click)="publish();" class="btn-violet">公开</div>
+      <div *ngIf="notePublish" (click)="unpublish();" class="btn-violet">取消公开</div>
       <div (click)="openDeleteModal();" class="btn-red">删除</div>
     </div>
   </div>

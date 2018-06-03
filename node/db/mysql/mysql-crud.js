@@ -1,7 +1,7 @@
 var pool = require('./mysql-connect');
 
 var userSelect = 'id, name, password, gender, age, phone, login_address loginAddress, create_date createDate, last_date lastDate';
-var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, note_content noteContent, author, private, create_date createDate, modify_date modifyDate';
+var noteSelect = 'id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, note_content noteContent, author, private isme, create_date createDate, modify_date modifyDate';
 var tagSelect = 'id, tag_name tagName, creator, create_date createDate, modify_date modifyDate';
 
 module.exports = {
@@ -82,7 +82,7 @@ module.exports = {
   getAllPublicNotes: function (start, size, author, tags, searchKey, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'note_content noteContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content noteContent, author, private isme, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';
@@ -126,7 +126,7 @@ module.exports = {
   getAuthorNotes: function (start, size, author, tags, createDate, callback) {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT DISTINCT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
-        'note_content noteContent, author, private, create_date createDate, modify_date modifyDate FROM `note` n ';
+        'note_content noteContent, author, private isme, create_date createDate, modify_date modifyDate FROM `note` n ';
       if (tags) {
         // TODO 防止SQL注入
         sql += 'JOIN `rel_note_tag` r ON r.note_id = n.id AND r.tag_id in ' + tags + ' ';
@@ -393,6 +393,44 @@ module.exports = {
     pool.getConnection(function (err, connection) {
       var sql = 'SELECT t.id, t.tag_name tagName, t.creator, t.create_date createDate, t.modify_date modifyDate FROM `tag` t JOIN `rel_note_tag` r ON r.tag_id = t.id AND r.note_id = ?';
       connection.query(sql, noteId, function (error, results) {
+        if (error) {
+          callback(error, results);
+        } else {
+          callback(error, results);
+        }
+      });
+      connection.release();
+    });
+  },
+
+  /**
+   * 公开笔记
+   * @param noteId 笔记ID
+   */
+  publish: function (noteId, callback) {
+    pool.getConnection(function (err, connection) {
+      var sql = 'UPDATE `note` SET private=0, modify_date=now() WHERE id=?';
+      var params = [noteId];
+      connection.query(sql, params, function (error, results) {
+        if (error) {
+          callback(error, results);
+        } else {
+          callback(error, results);
+        }
+      });
+      connection.release();
+    });
+  },
+
+  /**
+   * 取消公开笔记
+   * @param noteId 笔记ID
+   */
+  unpublish: function (noteId, callback) {
+    pool.getConnection(function (err, connection) {
+      var sql = 'UPDATE `note` SET private=1, modify_date=now() WHERE id=?';
+      var params = [noteId];
+      connection.query(sql, params, function (error, results) {
         if (error) {
           callback(error, results);
         } else {

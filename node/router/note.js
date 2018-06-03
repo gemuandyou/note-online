@@ -256,4 +256,40 @@ module.exports = function (app) {
         });
     });
 
+    /**
+     * 公开笔记
+     */
+    app.post('/note/publish', (req, res) => {
+        mysql.publish(req.body.noteId, (error, results, fields) => {
+            if (error) {
+                res.status(500).send(error);
+            } else {
+                res.json({
+                    'data': {
+                        'results': results,
+                        'fields': fields
+                    }
+                });
+            }
+        });
+    });
+
+    /**
+     * 取消公开笔记
+     */
+    app.post('/note/unpublish', (req, res) => {
+        mysql.unpublish(req.body.noteId, (error, results, fields) => {
+            if (error) {
+                res.status(500).send(error);
+            } else {
+                res.json({
+                    'data': {
+                        'results': results,
+                        'fields': fields
+                    }
+                });
+            }
+        });
+    });
+
 };
