@@ -19,10 +19,13 @@ import { SignUtil } from '../../util/sign.util';
 })
 export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
 
+    @ViewChild('calendar') calendarView;
+
     title = 'note-list';
     page: Page = new Page(1, 10);
     notes: Note[] = [];
     users: User[] = [];
+    dates: { createDate: '', noteCount: '' }[] = [];
     noteTags: Tag[] = [];
     conditionTags: number[] = [];
     conditionUserName: string;
@@ -30,6 +33,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
     searchKey: string; // 搜索条件
     isPc: boolean = true; // 是否是PC端
+    calendar: GMCalendar;
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) {
@@ -61,6 +65,34 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         window.addEventListener('scroll', this.windowScroll.bind(this));
+
+        // 获取所有笔记的日期列表
+        this.noteService.listDateFromMysql().subscribe((res1) => {
+            if (res1 && res1.data && res1.data.results) {
+                this.dates = res1.data.results;
+
+                let redDates = [];
+
+                this.dates.forEach(data => {
+                    redDates.push({ date: data.createDate.replace('-0', '-'), value: data.noteCount });
+                });
+
+                let calendarSettings = {
+                    width: '100%',
+                    height: '200px',
+                    redTip: redDates
+                };
+
+                this.calendar = new GMCalendar(this.calendarView.nativeElement, calendarSettings);
+
+                this.calendar.on('dateClick', params => {
+                    this.isResetCondition = true;
+                    this.getList('' + params.year + '-' +
+                        (params.month < 10 ? '0' : '') + params.month + '-' +
+                        (params.day < 10 ? '0' : '') + params.day);
+                });
+            }
+        });
     }
 
     ngOnDestroy(): void {
@@ -115,6 +147,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, this.conditionCreateDate, this.searchKey).subscribe((res) => {
             if (res && res.data && res.data.results) {
+                this.conditionCreateDate = '';
                 if (this.isResetCondition) {
                     this.notes = res.data.results;
                     this.isResetCondition = false;

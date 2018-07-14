@@ -142,6 +142,14 @@ export class NoteService extends BaseService {
     }
 
     /**
+     * 获取指定作者笔记的日期列表
+     * @param author 作者
+     */
+    listDateFromMysql(): Observable<any> {
+        return this.http.post(`/node-api/note/listDateFromMysql`, {});
+    }
+
+    /**
      * 建立笔记和标签关系
      * @param noteId 笔记ID
      * @param tags 标签名列表

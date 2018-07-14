@@ -1,0 +1,98 @@
+.gm-calendar-table thead {
+  background-color: #6fa3e6;
+  color: white;
+}
+
+.gm-calendar-table tbody {
+  color: cadetblue;
+}
+
+.gm-calendar-table .gray-td {
+  background-color: #f3f3f3;
+  color: darkgrey;
+}
+
+.gm-calendar-table .tody-td {
+  background-color: antiquewhite !important;
+  color: cadetblue !important;
+}
+
+.gm-calendar-table .active {
+  background-color: darkgrey;
+  color: white;
+}
+
+.gm-calendar-table, .gm-calendar-table tr td {
+  border: 1px solid #cfeaff;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.gm-calendar-table tr th:hover {
+  cursor: default;
+}
+
+.gm-calendar-table tr td:hover {
+  cursor: pointer;
+  background-color: darkgrey;
+  color: white;
+}
+
+.gm-calendar-table tr td pre {
+  margin: 0;
+}
+
+.gm-calendar-table .calendar-date-btn {
+  cursor: pointer;
+  color: white;
+  transition: color .2s;
+}
+
+.gm-calendar-table .calendar-date-btn:hover {
+  color: yellowgreen;
+}
+
+.gm-calendar-table .today-btn {
+  right: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: navajowhite;
+}
+
+.gm-calendar-table .red-tip {
+  top: 0px;
+  font-size: 9px;
+  width: 10px;
+  height: 10px;
+  background-color: mediumvioletred;    
+  color: yellow;
+  opacity: 0.65;
+}
+
+.gm-calendar-table .green-tip {
+  top: 10px;
+  font-size: 9px;
+  width: 10px;
+  height: 10px;
+  background-color: green;    
+  color: aliceblue;
+  opacity: 0.65;
+}
+
+.gm-calendar-table .blue-tip {
+  top: 20px;
+  font-size: 9px;
+  width: 10px;
+  height: 10px;
+  background-color: blue;    
+  color: yellow;
+  opacity: 0.65;
+}
+
+.p-r {
+  position: relative;
+}
+
+.p-a {
+  position: absolute;
+}

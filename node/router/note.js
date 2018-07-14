@@ -176,6 +176,24 @@ module.exports = function (app) {
     });
 
     /**
+     * 获取指定作者笔记的日期列表
+     */
+    app.post('/note/listDateFromMysql', (req, res) => {
+        mysql.getNoteDates((error, results, fields) => {
+            if (error) {
+                res.status(500).send(error);
+            } else {
+                res.json({
+                    'data': {
+                        'results': results,
+                        'fields': fields
+                    }
+                });
+            }
+        });
+    });
+
+    /**
      * 建立笔记和标签关系
      */
     app.post('/note/relTags', (req, res) => {

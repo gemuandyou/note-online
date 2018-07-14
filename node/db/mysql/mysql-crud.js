@@ -160,7 +160,23 @@ module.exports = {
    */
   getAuthorNoteDates: function (author, callback) {
     pool.getConnection(function (err, connection) {
-      connection.query('SELECT DATE_FORMAT(create_date, \'%Y-%m-%d\') createDate FROM `note` WHERE deleted = 0 AND author = ? GROUP BY create_date ORDER BY create_date desc', author, function (error, results, fields) {
+      connection.query('SELECT DATE_FORMAT(create_date, \'%Y-%m-%d\') createDate, count(create_date) noteCount FROM `note` WHERE deleted = 0 AND author = ? GROUP BY createDate ORDER BY create_date desc', author, function (error, results, fields) {
+        if (error) {
+          callback(error, results, fields);
+        } else {
+          callback(error, results, fields);
+        }
+      });
+      connection.release();
+    });
+  },
+
+  /**
+   * 获取所有笔记日期列表
+   */
+  getNoteDates: function (callback) {
+    pool.getConnection(function (err, connection) {
+      connection.query('SELECT DATE_FORMAT(create_date, \'%Y-%m-%d\') createDate, count(create_date) noteCount FROM `note` WHERE deleted = 0 AND private = 0 GROUP BY createDate ORDER BY create_date desc', function (error, results, fields) {
         if (error) {
           callback(error, results, fields);
         } else {

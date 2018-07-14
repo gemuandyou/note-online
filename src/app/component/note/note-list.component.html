@@ -9,6 +9,9 @@
       <div class="tag" (click)="conditionUser()">全部</div>
       <div class="tag" *ngFor="let user of users" (click)="conditionUser(user.name)" [ngClass]="{'active': conditionUserName === user.name}">{{user.name}}</div>
     </div>
+    <div class="module">
+      <div #calendar></div>
+    </div>
   </div>
   <div class="note-list">
     <div class="module" *ngFor="let note of notes" (click)="linkToView(note)">

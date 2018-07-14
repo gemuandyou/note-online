@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { NoteService } from '../../service/note.service';
 import { UserService } from '../../service/user.service';
 import { TagService } from '../../service/tag.service';
-import { RollUtil } from '../../util/roll.util';
 import { Page } from '../../util/page';
 import { Cookie } from '../../util/cookie';
 import { Note } from './note';
@@ -17,15 +16,18 @@ import { Tag } from './tag';
 })
 export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
 
+    @ViewChild('calendar') calendarView;
+
     title = 'note-mine';
     page: Page = new Page(1, 10);
     notes: Note[] = [];
-    dates: String[] = [];
+    dates: { createDate: '', noteCount: '' }[] = [];
     username: string;
     noteTags: Tag[] = [];
     conditionDateField: string;
     conditionTags: number[] = [];
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
+    calendar: GMCalendar;
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router) {
@@ -47,6 +49,19 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.noteService.listDateByAuthorFromMysql(this.username).subscribe((res1) => {
                     if (res1 && res1.data && res1.data.results) {
                         this.dates = res1.data.results;
+
+                        let redDates = [];
+
+                        this.dates.forEach(data => {
+                            redDates.push({ date: data.createDate.replace('-0', '-'), value: data.noteCount });
+                        });
+
+                        let calendarSettings = {
+                            width: '100%',
+                            height: '200px',
+                            redTip: redDates
+                        };
+                        this.calendar.refreshSetting(calendarSettings);
                     }
                 });
             } else {
@@ -57,6 +72,26 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         window.addEventListener('scroll', this.windowScroll.bind(this));
+
+        let redDates = [];
+
+        this.dates.forEach(data => {
+            redDates.push({ date: data.createDate.replace('-0', '-'), value: data.noteCount });
+        });
+
+        let calendarSettings = {
+            width: '100%',
+            height: '200px',
+            redTip: redDates
+        };
+
+        this.calendar = new GMCalendar(this.calendarView.nativeElement, calendarSettings);
+
+        this.calendar.on('dateClick', params => {
+            this.conditionDate('' + params.year + '-' +
+                (params.month < 10 ? '0' : '') + params.month + '-' +
+                (params.day < 10 ? '0' : '') + params.day);
+        });
     }
 
     ngOnDestroy(): void {
@@ -114,6 +149,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isResetCondition = true;
         }
         this.conditionDateField = date;
+        this.notes = [];
         this.getList();
     }
 
