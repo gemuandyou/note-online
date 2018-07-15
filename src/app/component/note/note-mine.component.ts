@@ -150,6 +150,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         this.conditionDateField = date;
         this.notes = [];
+        this.page = new Page(1, 10);
         this.getList();
     }
 
@@ -171,6 +172,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
         if (tagsLen !== this.conditionTags.length) {
             this.isResetCondition = true;
         }
+        this.page = new Page(1, 10);
         this.getList();
     }
 

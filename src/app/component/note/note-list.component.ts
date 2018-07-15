@@ -87,6 +87,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
 
                 this.calendar.on('dateClick', params => {
                     this.isResetCondition = true;
+                    this.page = new Page(1, 10);
                     this.getList('' + params.year + '-' +
                         (params.month < 10 ? '0' : '') + params.month + '-' +
                         (params.day < 10 ? '0' : '') + params.day);
@@ -170,6 +171,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.isResetCondition = true;
         }
         this.conditionUserName = username;
+        this.page = new Page(1, 10);
         this.getList();
     }
 
@@ -192,6 +194,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (tagsLen !== this.conditionTags.length) {
             this.isResetCondition = true;
         }
+        this.page = new Page(1, 10);
         this.getList();
     }
 
