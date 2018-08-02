@@ -74,7 +74,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                 let redDates = [];
 
                 this.dates.forEach(data => {
-                    redDates.push({ date: data.createDate.replace('-0', '-'), value: data.noteCount });
+                    redDates.push({ date: data.createDate.replace(/-0/g, '-'), value: data.noteCount });
                 });
 
                 let calendarSettings = {

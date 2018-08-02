@@ -8,6 +8,10 @@
 (function () {
     function gmCalendar(element, params) {
 
+        /**
+         * 加载配置信息
+         */
+
         var settings = {
             width: '100px',
             height: '100px',
@@ -37,6 +41,12 @@
         var eventParams;
         var eventQueue = {};
 
+        /**
+         * 渲染日历DOM节点
+         * @param {Number} year 
+         * @param {Number} month 
+         * @param {Number} day 
+         */
         var generatorCalendarElement = function (year, month, day) {
             var now = new Date();
             var date;
@@ -45,7 +55,7 @@
             } else {
                 date = new Date(year, month);
             }
-            lunar.setDate(date.getFullYear(), 1, 1);
+            lunar.setDate(date.getFullYear(), 6, 15);
 
             eventParams = {};
 
@@ -122,6 +132,7 @@
             var calendarEle = document.getElementsByClassName('gm-calendar-table')[0];
 
             // 绑定调整日期按钮的点击事件
+            calendarEle.getElementsByClassName('year-down')[0].removeEventListener('click', function() {});
             calendarEle.getElementsByClassName('year-down')[0].addEventListener('click', function (ev) {
                 if (year - 1 < 2001) {
                     return;
@@ -129,18 +140,22 @@
                 generatorCalendarElement(year - 1, month);
             });
 
+            calendarEle.getElementsByClassName('year-up')[0].removeEventListener('click', function() {});
             calendarEle.getElementsByClassName('year-up')[0].addEventListener('click', function (ev) {
                 generatorCalendarElement(year + 1, month);
             });
 
+            calendarEle.getElementsByClassName('month-down')[0].removeEventListener('click', function() {});
             calendarEle.getElementsByClassName('month-down')[0].addEventListener('click', function (ev) {
                 generatorCalendarElement(year, month - 1);
             });
 
+            calendarEle.getElementsByClassName('month-up')[0].removeEventListener('click', function() {});
             calendarEle.getElementsByClassName('month-up')[0].addEventListener('click', function (ev) {
                 generatorCalendarElement(year, month + 1);
             });
 
+            calendarEle.getElementsByClassName('today-btn')[0].removeEventListener('click', function() {});
             calendarEle.getElementsByClassName('today-btn')[0].addEventListener('click', function (ev) {
                 currentCalendar();
             });
@@ -315,6 +330,9 @@
                 this.cHour = Math.floor((this.theDate.getHours() + 1) / 2);
             },
 
+            /**
+             * 获取农历时间
+             */
             getLunarDateString: function () {
                 var tmp = '';
                 this.cYearString = '';
@@ -353,7 +371,9 @@
                 return tmp;
             },
 
-            //公历时间！
+            /**
+             * 获取公历时间
+             */
             getDateString: function () {
                 var tmp = '';
                 tmp += this.theDate.getFullYear() + '-' + (this.theDate.getMonth() + 1) + '-' + this.theDate.getDate() + ' ' +
