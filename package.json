@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 3600 --proxy-config proxy.config.json",
+    "start": "ng serve --port 3600 --host 0.0.0.0 --disable-host-check --proxy-config proxy.config.json",
     "build": "ng build",
     "build-aot": "ng build --prod -aot",
     "test": "ng test",
@@ -27,7 +27,7 @@
     "body-parser": "^1.18.2",
     "concurrent": "^0.3.2",
     "core-js": "^2.4.1",
-    "express": "^4.16.1",
+    "express": "^4.16.3",
     "highlightjs": "^9.10.0",
     "markdown-it": "^8.4.0",
     "mysql": "^2.15.0",
