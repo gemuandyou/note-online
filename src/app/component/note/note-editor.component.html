@@ -71,10 +71,10 @@
     <div class="set-tag">
       <input type="text" class="form-input" placeholder="添加标签" #addTag (keyup.enter)="chooseEnter(addTag)" (keyup.arrowDown)="chooseTag($event, addTag, 'down');"
         (keyup.arrowUp)="chooseTag($event, addTag, 'up');">
-      <span class="tag-tip">回车搜索相似标签，上下键选中后回车添加标签。若没有选则，再次回车则新建标签。</span>
+      <span class="tag-tip">回车搜索相似标签，上下键选中后回车或者鼠标双击添加标签。若没有选则，再次回车则新建标签。</span>
       <div class="tags-choose">
         <ol>
-          <li *ngFor="let chooseTag of chooseTags; index as i;" [ngClass]="{'active': chooseIndex - 1 === i}">{{chooseTag.tagName}}</li>
+          <li *ngFor="let chooseTag of chooseTags; index as i;" (dblclick)="clickTag(i)" [ngClass]="{'active': chooseIndex - 1 === i}">{{chooseTag.tagName}}</li>
         </ol>
       </div>
     </div>

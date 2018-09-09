@@ -389,6 +389,14 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /**
+     * 点击选择标签
+     * @param index 标签的下标
+     */
+    clickTag(index: number): void {
+        this.noteTags.push(this.chooseTags[index].tagName);
+    }
+
+    /**
      * 移除指定标签
      * @param tagName 标签名
      */
