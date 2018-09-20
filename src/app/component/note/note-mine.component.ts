@@ -104,7 +104,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     windowScroll(ev): void {
         const htmlDom = document.getElementsByTagName('html')[0];
-        const scrollTop = htmlDom.scrollTop;
+        const scrollTop = htmlDom.scrollTop || window.scrollY; // 移动端中scrollTop无效，需要获取window的scrollY
         const scrollHeight = htmlDom.scrollHeight;
         const clientHeight = htmlDom.clientHeight;
         if (scrollHeight <= scrollTop + clientHeight && scrollTop !== 0) {
