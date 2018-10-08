@@ -1,4 +1,4 @@
-# Markdown在线笔记（[在线地址：http://gemuandyou.cn:666/](http://gemuandyou.cn:666/)）
+# Markdown在线笔记
 ## 安装项目依赖
 ```shell
 yarn install
