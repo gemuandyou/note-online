@@ -1,8 +1,9 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NoteService } from '../../service/note.service';
 import { Note } from './note';
 import { ParseStructure, NoteStructure } from '../../util/parse-struct';
+import { Cookie } from '../../util/cookie';
 
 @Component({
     selector: 'app-note-view',
@@ -17,6 +18,7 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('notesViewer') notesViewer;
     notesViewerEle: any;
     // 笔记元数据
+    noteId: number; // 笔记ID
     noteAuthor: string; // 笔记作者
     noteTitle: string; // 笔记标题
     noteCreateTime: number; // 笔记创建时间
@@ -25,8 +27,9 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     needPreview: boolean = false; // 是否显示笔记预览
     isPc: boolean = true; // 是否是PC端
     activeNum: number = -1; // 当前内容的预览标题序号
+    isMe: boolean = false; // 是否是笔记作者
 
-    constructor(private noteService: NoteService, private activateRoute: ActivatedRoute) {
+    constructor(private noteService: NoteService, private activateRoute: ActivatedRoute, private router: Router) {
         // 判断浏览器类型，区分移动端和PC端
         var style = document.createElement('link');
         style.rel = 'stylesheet';
@@ -47,10 +50,17 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.noteCreateTime = this.activateRoute.snapshot.queryParams.time;
         // this.noteTitle = this.activateRoute.snapshot.queryParams.title;
         let params = this.activateRoute.params["value"];
+        this.noteId = params["id"];
         this.currentNoteUrl = params["url"];
         this.noteAuthor = params["author"];
         this.noteCreateTime = params["time"];
         this.noteTitle = params["title"];
+
+        // TODO 加强用户安全性
+        if (decodeURI(Cookie.getCookie('un')) === this.noteAuthor) {
+            this.isMe = true;
+        }
+
         if (this.currentNoteUrl) {
             this.noteService.readFromMd(this.currentNoteUrl, true).subscribe((res) => {
                 if (res.data) {
@@ -101,6 +111,15 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     preventScroll(ev: any) {
         ev.stopPropagation();
         ev.preventDefault();
+    }
+
+    /**
+     * 跳到笔记编辑页面
+     * @param note 笔记对象
+     */
+    linkToEdit(note: Note): void {
+        // this.router.navigate(['/note-editor'], { queryParams: { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id } });
+        this.router.navigate(['/note-editor', { noteUrl: this.currentNoteUrl, noteTitle: this.noteTitle, noteId: this.noteId, isme: this.isMe }]);
     }
 
 }

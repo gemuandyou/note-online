@@ -1,6 +1,7 @@
 <div class="note-view">
   <h1 class="title">{{noteTitle}}</h1>
   <div class="info">
+    <div class="edit" *ngIf="isMe" (click)="linkToEdit()">[编辑]</div>
     <div class="time">{{noteCreateTime}}</div>
     <div class="author">{{noteAuthor}}</div>
   </div>

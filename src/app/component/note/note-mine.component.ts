@@ -35,6 +35,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        // TODO 加强用户安全性
         this.username = decodeURI(Cookie.getCookie('un'));
         if (!this.username) {
             this.router.navigate(['/user-regist']);

@@ -15,12 +15,21 @@
   color: #B0B0B0;
 }
 
-.author {
+.info .author {
   display: inline-block;
 }
 
-.time {
+.info .time {
   display: inline-block;
+}
+
+.info .edit {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.info .edit:hover {
+  color: black;
 }
 
 .note-preview-content {

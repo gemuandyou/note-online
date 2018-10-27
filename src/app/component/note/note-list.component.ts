@@ -129,6 +129,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         //     }
         // });
         this.router.navigate(['/note-view', {
+            id: note.id,
             url: note.noteUrl,
             author: note.author,
             title: note.noteTitle,
