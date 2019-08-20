@@ -51,8 +51,8 @@
   <div class="content">
     <div class="viewer" #notesViewer [ngClass]="{'hidden': hideViewer, 'width-full': hideEditor}">
     </div>
-    <div class="editor" contenteditable="plaintext-only" #notesEditor (keyup)="changeEdit($event)" [ngClass]="{'hidden': hideEditor, 'width-full': hideViewer}">
-    </div>
+    <textarea class="editor" #notesEditor [ngClass]="{'hidden': hideEditor, 'width-full': hideViewer}">
+    </textarea>
   </div>
 
   <!-- 保存弹出框 -->

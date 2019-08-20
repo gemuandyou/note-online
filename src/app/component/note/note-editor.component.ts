@@ -9,6 +9,8 @@ import { Cookie } from '../../util/cookie';
 import { ModalBoxComponent } from '../modalbox/modalbox.component';
 import { Note } from './note';
 import { Tag } from './tag';
+import 'codemirror/lib/codemirror.css';
+import * as CodeMirror from 'codemirror/lib/codemirror';
 
 @Component({
     selector: 'app-note-editor',
@@ -98,6 +100,14 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.notesEditorEle.addEventListener('paste', (e) => {
             const pasteItems = e.clipboardData.items;
             this.pasteHandle(pasteItems);
+        });
+
+        // codemirror 实现的编辑器
+        var codeEditor = CodeMirror.fromTextArea(this.notesEditorEle, {
+          mode:'markdown',
+          theme:'monokai', //编辑器主题
+          extraKeys: {"Ctrl": "autocomplete"},//ctrl可以弹出选择项 
+          lineNumbers: true//显示行号
         });
     }
 
