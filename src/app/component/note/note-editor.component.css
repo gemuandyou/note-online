@@ -199,11 +199,3 @@
   background-color: #0095ff;
   cursor: pointer;
 }
-
-code {
-  /* word-break: break-all; */ /* 英文单词断行 */
-  /* word-wrap: break-word; */ /* 自动换行 */
-  white-space: pre-wrap;
-  overflow: auto;
-  display: block
-}
