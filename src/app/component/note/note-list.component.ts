@@ -147,20 +147,48 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (createDate) {
             this.conditionCreateDate = createDate;
         }
-        this.noteService.allMds(this.page, this.conditionUserName, this.conditionTags, this.conditionCreateDate, this.searchKey).subscribe((res) => {
-            if (res && res.data && res.data.results) {
-                this.conditionCreateDate = '';
-                if (this.isResetCondition) {
-                    this.notes = res.data.results;
-                    this.isResetCondition = false;
-                } else {
-                    this.notes = this.notes.concat(res.data.results);
+        if (this.searchKey) {
+            this.noteService.search(this.searchKey).subscribe((res) => {
+                if (res && res.data && res.data.results) {
+                    this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
+                    .subscribe((res1) => {
+                        if (res1 && res1.data && res1.data.results) {
+                            this.conditionCreateDate = '';
+                            if (this.isResetCondition) {
+                                this.notes = res1.data.results;
+                                this.isResetCondition = false;
+                            } else {
+                                this.notes = this.notes.concat(res1.data.results);
+                            }
+                            if (res1.data.results.length <= 0) {
+                                this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                            }
+                        }
+                    });
                 }
-                if (res.data.results.length <= 0) {
-                    this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+            });
+        } else {
+            this.noteService.allMds(
+                this.page,
+                this.conditionUserName,
+                this.conditionTags,
+                this.conditionCreateDate,
+                this.searchKey)
+            .subscribe((res) => {
+                if (res && res.data && res.data.results) {
+                    this.conditionCreateDate = '';
+                    if (this.isResetCondition) {
+                        this.notes = res.data.results;
+                        this.isResetCondition = false;
+                    } else {
+                        this.notes = this.notes.concat(res.data.results);
+                    }
+                    if (res.data.results.length <= 0) {
+                        this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**

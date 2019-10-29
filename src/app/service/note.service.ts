@@ -36,6 +36,16 @@ export class NoteService extends BaseService {
     }
 
     /**
+     * 根据笔记ID获取笔记列表，时间排序
+     * @param ids 笔记ID集合
+     */
+    allMdsByIds(ids?: number[]): Observable<any> {
+        return this.http.post(`/node-api/note/listByIds`, {
+            ids: ids
+        });
+    }
+
+    /**
      * 将文本渲染为html
      * @param text Markdown文本内容
      */
@@ -189,6 +199,14 @@ export class NoteService extends BaseService {
      */
     unpublish(noteId: number): Observable<any> {
         return this.http.post(`/node-api/note/unpublish`, { noteId: noteId });
+    }
+
+    /**
+     * 关键字搜索
+     * @param searchKey 搜索的关键字
+     */
+    search(searchKey: string): Observable<any> {
+        return this.http.post('/node-api/note/search', { searchKey: searchKey });
     }
 
 }

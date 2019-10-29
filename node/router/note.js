@@ -1,8 +1,52 @@
 var md = require('../note/markdown');
 var fh = require('../note/file-handler');
 var mysql = require('../db/mysql/mysql-crud.js');
+var es = require('../db/elasticsearch/es-crud.js');
 
 module.exports = function (app) {
+
+    /**
+     * 关键字搜索
+     */
+    app.post('/note/search', (req, res) => {
+        let esQuery = {
+            "_source": {
+                "includes": [ "id" ],
+                "excludes": []
+            },
+            "query": {
+                "bool": {
+                    "should": [
+                        {
+                            "match": {
+                                "note_title": req.body.searchKey
+                            }
+                        },
+                        {
+                            "match": {
+                                "note_content": req.body.searchKey
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+        es.searchNote(esQuery, (result) => {
+            if (result && result.hits && result.hits.total > 0) {
+                res.json({
+                    'data': {
+                        'results': result.hits.hits
+                    }
+                });
+            } else {
+                res.json({
+                    'data': {
+                        'results': []
+                    }
+                });
+            }
+        });
+    });
 
     /**
      * 获取笔记列表
@@ -15,6 +59,24 @@ module.exports = function (app) {
             req.body.tags,
             req.body.searchKey,
             req.body.createDate, (error, results, fields) => {
+                if (error) {
+                    res.status(500).send(error);
+                } else {
+                    res.json({
+                        'data': {
+                            'results': results,
+                            'fields': fields
+                        }
+                    });
+                }
+            });
+    });
+
+    /**
+     * 获取笔记列表
+     */
+    app.post('/note/listByIds', (req, res) => {
+        mysql.getNotesByIds(req.body.ids, (error, results, fields) => {
                 if (error) {
                     res.status(500).send(error);
                 } else {
