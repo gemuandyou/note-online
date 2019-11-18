@@ -1,6 +1,6 @@
 const elasticsearch = require('elasticsearch');
 const es_client = new elasticsearch.Client({
-    host: '192.168.18.35:9200',
+    host: '127.0.0.1：9200',
     log: 'error'
 });
 

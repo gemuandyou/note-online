@@ -14,6 +14,16 @@ module.exports = function (app) {
                 "includes": [ "id" ],
                 "excludes": []
             },
+            "size": 20,
+            "from": 0,
+            "sort": {
+                "_score": {
+                    "order": "desc"
+                },
+                "_id": {
+                    "order": "asc"
+                }
+            },
             "query": {
                 "bool": {
                     "should": [
@@ -31,6 +41,9 @@ module.exports = function (app) {
                 }
             }
         };
+        if (req.body.esSearchAfter && req.body.esSearchAfter.length > 0) {
+            esQuery["search_after"] = req.body.esSearchAfter;
+        }
         es.searchNote(esQuery, (result) => {
             if (result && result.hits && result.hits.total > 0) {
                 res.json({
@@ -38,11 +51,15 @@ module.exports = function (app) {
                         'results': result.hits.hits
                     }
                 });
-            } else {
+            } else if (result) {
                 res.json({
                     'data': {
                         'results': []
                     }
+                });
+            } else {
+                res.json({
+                    'data': 'ERROR_100'
                 });
             }
         });

@@ -205,8 +205,8 @@ export class NoteService extends BaseService {
      * 关键字搜索
      * @param searchKey 搜索的关键字
      */
-    search(searchKey: string): Observable<any> {
-        return this.http.post('/node-api/note/search', { searchKey: searchKey });
+    search(searchKey: string, esSearchAfter: string[]): Observable<any> {
+        return this.http.post('/node-api/note/search', { searchKey: searchKey, esSearchAfter: esSearchAfter });
     }
 
 }

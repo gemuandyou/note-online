@@ -34,11 +34,12 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     searchKey: string; // 搜索条件
     isPc: boolean = true; // 是否是PC端
     calendar: GMCalendar;
+    esSearchAfter: string[] = []; // ES搜索分页的最后一条数据标识
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) {
         // 判断浏览器类型，区分移动端和PC端
-        var style = document.createElement('link');
+        let style = document.createElement('link');
         style.rel = 'stylesheet';
         style.type = 'text/css';
         let isAndroid = navigator.appVersion.match(/android/gi);
@@ -148,47 +149,70 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
             this.conditionCreateDate = createDate;
         }
         if (this.searchKey) {
-            this.noteService.search(this.searchKey).subscribe((res) => {
-                if (res && res.data && res.data.results) {
-                    this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
-                    .subscribe((res1) => {
-                        if (res1 && res1.data && res1.data.results) {
-                            this.conditionCreateDate = '';
-                            if (this.isResetCondition) {
-                                this.notes = res1.data.results;
-                                this.isResetCondition = false;
-                            } else {
-                                this.notes = this.notes.concat(res1.data.results);
-                            }
-                            if (res1.data.results.length <= 0) {
-                                this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
-                            }
-                        }
-                    });
-                }
-            });
+            this.getListFromES();
         } else {
-            this.noteService.allMds(
-                this.page,
-                this.conditionUserName,
-                this.conditionTags,
-                this.conditionCreateDate,
-                this.searchKey)
-            .subscribe((res) => {
-                if (res && res.data && res.data.results) {
-                    this.conditionCreateDate = '';
-                    if (this.isResetCondition) {
-                        this.notes = res.data.results;
-                        this.isResetCondition = false;
-                    } else {
-                        this.notes = this.notes.concat(res.data.results);
-                    }
-                    if (res.data.results.length <= 0) {
-                        this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
-                    }
-                }
-            });
+            this.getListFromMySQL();
         }
+    }
+
+    /**
+     * 从MySQL中获取数据
+     */
+    getListFromMySQL(): void {
+        this.noteService.allMds(
+            this.page,
+            this.conditionUserName,
+            this.conditionTags,
+            this.conditionCreateDate,
+            this.searchKey)
+        .subscribe((res) => {
+            if (res && res.data && res.data.results) {
+                this.conditionCreateDate = '';
+                if (this.isResetCondition) {
+                    this.notes = res.data.results;
+                    this.isResetCondition = false;
+                } else {
+                    this.notes = this.notes.concat(res.data.results);
+                }
+                if (res.data.results.length <= 0) {
+                    this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                }
+            }
+        });
+    }
+
+    /**
+     * 从Elasticsearch中搜索数据。若ES获取数据失败，那么从MYSQL中获取。
+     */
+    getListFromES(): void {
+        this.noteService.search(this.searchKey, this.esSearchAfter).subscribe((res) => {
+            if (res && res.data === 'ERROR_100') {
+                this.getListFromMySQL();
+                this.esSearchAfter = [];
+            } else if (res && res.data && res.data.results) {
+                // 设置elasticsearch search_after分页参数
+                if (res.data.results.length > 0) {
+                    let lastRecord = res.data.results[res.data.results.length - 1];
+                    this.esSearchAfter = [lastRecord._score, lastRecord._id];
+                }
+
+                this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
+                .subscribe((res1) => {
+                    if (res1 && res1.data && res1.data.results) {
+                        this.conditionCreateDate = '';
+                        if (this.isResetCondition) {
+                            this.notes = res1.data.results;
+                            this.isResetCondition = false;
+                        } else {
+                            this.notes = this.notes.concat(res1.data.results);
+                        }
+                        if (res1.data.results.length <= 0) {
+                            this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                        }
+                    }
+                });
+            }
+        });
     }
 
     /**
