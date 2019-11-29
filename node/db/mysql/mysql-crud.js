@@ -128,8 +128,10 @@ module.exports = {
             var sql = 'SELECT n.id, note_title noteTitle, note_url noteUrl, note_introduction noteIntroduction, ' +
                 'note_content noteContent, author, private isme, create_date createDate, modify_date modifyDate FROM `note` n ';
             sql += 'WHERE deleted = 0 AND private = 0 ';
+            var orderByField = '';
 
             var params = [];
+            var orderByParams = [];
 
             if (!ids || ids.length <= 0) {
                 sql += ' AND 1=2';
@@ -137,13 +139,20 @@ module.exports = {
                 sql += ' AND id IN (';
                 for (var i = 0; i < ids.length; i++) {
                     params.push(ids[i]);
+                    orderByParams.push(ids[i]);
                     sql += '?,';
+                    orderByField += '?,';
                 }
                 sql = sql.substring(0, sql.length - 1);
+                orderByField = orderByField.substring(0, orderByField.length - 1);
                 sql = sql + ')';
             }
+
+            // 保证结果为 in 条件中的顺序
+            sql += ' ORDER BY FIELD(id, ' + orderByField + ')';
+
             console.log(sql, params)
-            connection.query(sql, params, function (error, results, fields) {
+            connection.query(sql, params.concat(orderByParams), function (error, results, fields) {
                 if (error) {
                     callback(error, results, fields);
                 } else {
