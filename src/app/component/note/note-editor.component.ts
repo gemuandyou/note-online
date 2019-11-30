@@ -154,11 +154,12 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param event 事件
      */
     changeEdit(event): void {
-        const editor = this.notesEditorEle.innerText;
+        let editor = this.notesEditorEle.innerText;
         if (!editor) {
             return;
         }
 
+        editor = this.commonCharConvertToMD(editor);
         this.saveTempNote(editor);
 
         // 仅仅输入回车后才会执行下面的渲染HTML操作，这样是为了提高性能
@@ -189,6 +190,22 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 // console.warn(this.notesViewerEle.querySelectorAll('.soon'));
             }, 100);
         });
+    }
+
+    /**
+     * 通用字符转换为Markdown字符。<br>
+     *     <ul>
+     *         <li>· => `</li>
+     *         <li>、[回车] => \[回车]</li>
+     *     </ul>
+     * @param content
+     */
+    commonCharConvertToMD(content: string): string {
+        // 中文的“·”符号转为英文的“`”符号
+        content = content.replace(/·/g, '`');
+        // 中文的“、[回车]”字符串转为“\[回车]”
+        content = content.replace(/、\n/g, '\\\n');
+        return content;
     }
 
     /**
