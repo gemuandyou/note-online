@@ -146,10 +146,10 @@ module.exports = {
                 sql = sql.substring(0, sql.length - 1);
                 orderByField = orderByField.substring(0, orderByField.length - 1);
                 sql = sql + ')';
-            }
 
-            // 保证结果为 in 条件中的顺序
-            sql += ' ORDER BY FIELD(id, ' + orderByField + ')';
+                // 保证结果为 in 条件中的顺序
+                sql += ' ORDER BY FIELD(id, ' + orderByField + ')';
+            }
 
             console.log(sql, params)
             connection.query(sql, params.concat(orderByParams), function (error, results, fields) {
