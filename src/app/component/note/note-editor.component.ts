@@ -59,10 +59,10 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.noteId = this.activateRoute.snapshot.queryParams.noteId;
         // this.currentNoteUrl = this.activateRoute.snapshot.queryParams.noteUrl;
         // this.noteTitle = this.activateRoute.snapshot.queryParams.noteTitle;
-        let params = this.activateRoute.params['value'];
+        const params = this.activateRoute.params['value'];
         this.noteId = params['noteId'];
         this.currentNoteUrl = params['noteUrl'];
-        this.noteTitle = params['noteTitle'];
+        this.noteTitle = decodeURIComponent(params['noteTitle']);
         this.notePublish = params['isme'] == 0;
         this.notesEditorEle = this.notesEditor.nativeElement;
         // 加载笔记内容

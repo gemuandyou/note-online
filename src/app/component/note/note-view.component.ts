@@ -31,12 +31,12 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(private noteService: NoteService, private activateRoute: ActivatedRoute, private router: Router) {
         // 判断浏览器类型，区分移动端和PC端
-        var style = document.createElement('link');
+        const style = document.createElement('link');
         style.rel = 'stylesheet';
         style.type = 'text/css';
-        let isAndroid = navigator.appVersion.match(/android/gi);
-        let isIPhone = navigator.appVersion.match(/iphone/gi);
-        let isIPad = navigator.appVersion.match(/iPad/gi);
+        const isAndroid = navigator.appVersion.match(/android/gi);
+        const isIPhone = navigator.appVersion.match(/iphone/gi);
+        const isIPad = navigator.appVersion.match(/iPad/gi);
         this.isPc = !isAndroid && !isIPhone && !isIPad;
         if (!this.isPc) {
             style.href = 'assets/style/note-view.mobile.css';
@@ -49,12 +49,12 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
         // this.noteAuthor = this.activateRoute.snapshot.queryParams.author;
         // this.noteCreateTime = this.activateRoute.snapshot.queryParams.time;
         // this.noteTitle = this.activateRoute.snapshot.queryParams.title;
-        let params = this.activateRoute.params["value"];
-        this.noteId = params["id"];
-        this.currentNoteUrl = params["url"];
-        this.noteAuthor = params["author"];
-        this.noteCreateTime = params["time"];
-        this.noteTitle = params["title"];
+        const params = this.activateRoute.params['value'];
+        this.noteId = params['id'];
+        this.currentNoteUrl = params['url'];
+        this.noteAuthor = decodeURIComponent(params['author']);
+        this.noteCreateTime = params['time'];
+        this.noteTitle = decodeURIComponent(params['title']);
 
         // TODO 加强用户安全性
         if (decodeURI(Cookie.getCookie('un')) === this.noteAuthor) {
@@ -78,12 +78,12 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        window.addEventListener("scroll", (ev) => {
+        window.addEventListener('scroll', (ev) => {
             this.activeNum = -1;
             this.previewStructures.forEach(preview => {
                 if (preview && preview.dom && (preview.dom.offsetTop - 60) < window.scrollY) {
                     this.activeNum++;
-                    console.count("遍历预览标题，显示高亮");
+                    console.count('遍历预览标题，显示高亮');
                 } else {
                     return;
                 }
@@ -119,7 +119,12 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     linkToEdit(note: Note): void {
         // this.router.navigate(['/note-editor'], { queryParams: { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id } });
-        this.router.navigate(['/note-editor', { noteUrl: this.currentNoteUrl, noteTitle: this.noteTitle, noteId: this.noteId, isme: this.isMe }]);
+        this.router.navigate(['/note-editor', {
+            noteUrl: this.currentNoteUrl,
+            noteTitle: encodeURIComponent(this.noteTitle),
+            noteId: this.noteId,
+            isme: this.isMe
+        }]);
     }
 
 }

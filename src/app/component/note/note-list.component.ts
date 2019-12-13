@@ -132,8 +132,8 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate(['/note-view', {
             id: note.id,
             url: note.noteUrl,
-            author: note.author,
-            title: note.noteTitle,
+            author: encodeURIComponent(note.author),
+            title: encodeURIComponent(note.noteTitle),
             time: this.datePipe.transform(note.createDate, 'yyyy-MM-dd HH:mm:ss')
         }]);
     }
@@ -192,7 +192,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
             } else if (res && res.data && res.data.results) {
                 // 设置elasticsearch search_after分页参数
                 if (res.data.results.length > 0) {
-                    let lastRecord = res.data.results[res.data.results.length - 1];
+                    const lastRecord = res.data.results[res.data.results.length - 1];
                     this.esSearchAfter = [lastRecord._score, lastRecord._id];
                 }
 

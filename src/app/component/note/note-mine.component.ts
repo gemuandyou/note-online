@@ -138,7 +138,12 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     linkToEdit(note: Note): void {
         // this.router.navigate(['/note-editor'], { queryParams: { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id } });
-        this.router.navigate(['/note-editor', { noteUrl: note.noteUrl, noteTitle: note.noteTitle, noteId: note.id, isme: note.isme }]);
+        this.router.navigate(['/note-editor', {
+            noteUrl: note.noteUrl,
+            noteTitle: encodeURIComponent(note.noteTitle),
+            noteId: note.id,
+            isme: note.isme
+        }]);
     }
 
     /**h
