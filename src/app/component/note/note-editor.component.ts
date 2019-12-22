@@ -227,7 +227,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     saveNote(): void {
         // TODO 渲染HTML后保存，这里为了性能，省略此步骤，只需在保存前在编辑中输入回车即可
 
-        const editor = this.notesEditorEle.innerText;
+        let editor = this.notesEditorEle.innerText;
+        editor = this.commonCharConvertToMD(editor);
         const username = decodeURI(Cookie.getCookie('un'));
         if (!editor || !username) {
             return;
