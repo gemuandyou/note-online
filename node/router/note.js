@@ -25,19 +25,23 @@ module.exports = function (app) {
                 }
             },
             "query": {
-                "bool": {
-                    "should": [
-                        {
-                            "match": {
-                                "note_title": req.body.searchKey
-                            }
-                        },
-                        {
-                            "match": {
-                                "note_content": req.body.searchKey
-                            }
-                        }
-                    ]
+                // "bool": {
+                //     "should": [
+                //         {
+                //             "match": {
+                //                 "note_title": req.body.searchKey
+                //             }
+                //         },
+                //         {
+                //             "match": {
+                //                 "note_content": req.body.searchKey
+                //             }
+                //         }
+                //     ]
+                // }
+                "multi_match": {
+                    "query": req.body.searchKey,
+                    "fields": ["note_title", "note_content"]
                 }
             }
         };
