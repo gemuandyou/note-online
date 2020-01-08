@@ -8,6 +8,7 @@ import { NoteEditorComponent } from './note-editor.component';
 import { NoteMineComponent } from './note-mine.component';
 import { NoteViewComponent } from './note-view.component';
 import { RetractDirective } from './retract.directive';
+import {DynamicHtmlPipe} from '../pipe/DynamicHtmlPipe';
 
 /**
  * 配置根路由
@@ -36,13 +37,14 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    NoteListComponent,
-    NoteEditorComponent,
-    NoteMineComponent,
-    NoteViewComponent,
-    RetractDirective
-  ],
+    declarations: [
+        NoteListComponent,
+        NoteEditorComponent,
+        NoteMineComponent,
+        NoteViewComponent,
+        RetractDirective,
+        DynamicHtmlPipe
+    ],
   imports: [
     CommonModule,
     FormsModule,

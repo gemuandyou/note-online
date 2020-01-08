@@ -18,7 +18,7 @@
       <div class="module-author">{{note.author}}</div>
       <div class="module-date">{{note.createDate | date: 'yyyy-MM-dd HH:mm:ss'}}</div>
       <div class="module-title">{{note.noteTitle}}</div>
-      <div class="module-introduction">{{note.noteIntroduction}}</div>
+      <div class="module-introduction"><p class="search-highlight" [innerHTML]="note.searchHighlight | dynamicHtml"></p>{{note.noteIntroduction}}</div>
     </div>
   </div>
 </div>

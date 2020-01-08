@@ -10,12 +10,13 @@ import { Note } from './note';
 import { Tag } from './tag';
 import { User } from '../user/user';
 import { SignUtil } from '../../util/sign.util';
+import {DynamicHtmlPipe} from '../pipe/DynamicHtmlPipe';
 
 @Component({
     selector: 'app-note-list',
     templateUrl: './note-list.component.html',
     styleUrls: ['./note-list.component.css', '../../common.css'],
-    providers: [NoteService, UserService, TagService, DatePipe]
+    providers: [NoteService, UserService, TagService, DatePipe, DynamicHtmlPipe]
 })
 export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -35,6 +36,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     isPc: boolean = true; // 是否是PC端
     calendar: GMCalendar;
     esSearchAfter: string[] = []; // ES搜索分页的最后一条数据标识
+    idAndHighlightMap: Object = {}; // ES搜索后笔记ID和搜索匹配高亮内容映射
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) {
@@ -190,27 +192,42 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.getListFromMySQL();
                 this.esSearchAfter = [];
             } else if (res && res.data && res.data.results) {
-                // 设置elasticsearch search_after分页参数
                 if (res.data.results.length > 0) {
+                    // 设置elasticsearch search_after分页参数
                     const lastRecord = res.data.results[res.data.results.length - 1];
                     this.esSearchAfter = [lastRecord._score, lastRecord._id];
-                }
 
-                this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
-                .subscribe((res1) => {
-                    if (res1 && res1.data && res1.data.results) {
-                        this.conditionCreateDate = '';
-                        if (this.isResetCondition) {
-                            this.notes = res1.data.results;
-                            this.isResetCondition = false;
-                        } else {
-                            this.notes = this.notes.concat(res1.data.results);
-                        }
-                        if (res1.data.results.length <= 0) {
-                            this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
-                        }
-                    }
-                });
+                    res.data.results.map(doc => {
+                        this.idAndHighlightMap[doc._source.id] = doc.highlight.note_content;
+                    });
+
+                    this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
+                        .subscribe((res1) => {
+                            if (res1 && res1.data && res1.data.results) {
+                                this.conditionCreateDate = '';
+                                const noteList = res1.data.results;
+
+                                // 查询匹配后的高亮内容
+                                noteList.forEach(note => {
+                                    note.searchHighlight = '';
+                                    this.idAndHighlightMap[note.id].forEach(highlight => {
+                                        note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
+                                    });
+                                    note.searchHighlight += '<hr>';
+                                });
+
+                                if (this.isResetCondition) {
+                                    this.notes = noteList;
+                                    this.isResetCondition = false;
+                                } else {
+                                    this.notes = this.notes.concat(noteList);
+                                }
+                                if (res1.data.results.length <= 0) {
+                                    this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                                }
+                            }
+                        });
+                }
             }
         });
     }

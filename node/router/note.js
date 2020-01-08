@@ -11,7 +11,7 @@ module.exports = function (app) {
     app.post('/note/search', (req, res) => {
         let esQuery = {
             "_source": {
-                "includes": [ "id" ],
+                "includes": [ "id", "note_title", "note_content" ],
                 "excludes": []
             },
             "size": 20,
@@ -42,6 +42,11 @@ module.exports = function (app) {
                 "multi_match": {
                     "query": req.body.searchKey,
                     "fields": ["note_title", "note_content"]
+                }
+            },
+            "highlight": {
+                "fields": {
+                    "note_content": {}
                 }
             }
         };
