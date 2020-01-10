@@ -212,10 +212,12 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                                 // 查询匹配后的高亮内容
                                 noteList.forEach(note => {
                                     note.searchHighlight = '';
-                                    this.idAndHighlightMap[note.id].forEach(highlight => {
-                                        note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
-                                    });
-                                    note.searchHighlight += '<hr>';
+                                    if (this.idAndHighlightMap[note.id]) {
+                                        this.idAndHighlightMap[note.id].forEach(highlight => {
+                                            note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
+                                        });
+                                        note.searchHighlight += '<hr>';
+                                    }
                                 });
 
                                 if (this.isResetCondition) {
