@@ -37,6 +37,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     calendar: GMCalendar;
     esSearchAfter: string[] = []; // ES搜索分页的最后一条数据标识
     idAndHighlightMap: Object = {}; // ES搜索后笔记ID和搜索匹配高亮内容映射
+    haveMore: boolean = true;
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router, private datePipe: DatePipe, private activateRoute: ActivatedRoute) {
@@ -67,7 +68,8 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        window.addEventListener('scroll', this.windowScroll.bind(this));
+        // 去除滚动分页，改为点击按钮分页
+        // window.addEventListener('scroll', this.windowScroll.bind(this));
 
         // 获取所有笔记的日期列表
         this.noteService.listDateFromMysql().subscribe((res1) => {
@@ -100,12 +102,14 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        window.removeEventListener('scroll', this.windowScroll.bind(this));
+        // 去除滚动分页，改为点击按钮分页
+        // window.removeEventListener('scroll', this.windowScroll.bind(this));
     }
 
     /**
      * window的滚动事件
      * @param ev 滚动事件
+     * @deprecated
      */
     windowScroll(ev): void {
         const htmlDom = document.getElementsByTagName('html')[0];
@@ -170,6 +174,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe((res) => {
             if (res && res.data && res.data.results) {
                 this.conditionCreateDate = '';
+                this.haveMore = res.data.results.length > 0;
                 if (this.isResetCondition) {
                     this.notes = res.data.results;
                     this.isResetCondition = false;
@@ -187,12 +192,18 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * 从Elasticsearch中搜索数据。若ES获取数据失败，那么从MYSQL中获取。
      */
     getListFromES(): void {
+        // 清楚所有过滤条件
+        this.conditionTags = [];
+        this.conditionUserName = '';
+        this.conditionCreateDate = '';
+
         this.noteService.search(this.searchKey, this.esSearchAfter).subscribe((res) => {
             if (res && res.data === 'ERROR_100') {
                 this.getListFromMySQL();
                 this.esSearchAfter = [];
             } else if (res && res.data && res.data.results) {
                 if (res.data.results.length > 0) {
+                    this.haveMore = true;
                     // 设置elasticsearch search_after分页参数
                     const lastRecord = res.data.results[res.data.results.length - 1];
                     this.esSearchAfter = [lastRecord._score, lastRecord._id];
@@ -203,34 +214,69 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                         }
                     });
 
-                    this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
-                        .subscribe((res1) => {
-                            if (res1 && res1.data && res1.data.results) {
-                                this.conditionCreateDate = '';
-                                const noteList = res1.data.results;
+                    const noteList = [];
+                    // 查询匹配后的高亮内容
+                    res.data.results.forEach(doc => {
+                        const esNote = doc._source;
+                        esNote.searchHighlight = '';
+                        const note = {
+                            id: esNote['id'],
+                            noteTitle: esNote['note_title'],
+                            noteIntroduction: esNote['note_introduction'],
+                            noteContent: esNote['note_content'],
+                            author: esNote['author'],
+                            createDate: esNote['create_date'],
+                            searchHighlight: ''
+                        };
+                        if (this.idAndHighlightMap[note.id]) {
+                            this.idAndHighlightMap[note.id].forEach(highlight => {
+                                note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
+                            });
+                            note.searchHighlight += '<hr>';
+                        }
+                        noteList.push(note);
+                    });
 
-                                // 查询匹配后的高亮内容
-                                noteList.forEach(note => {
-                                    note.searchHighlight = '';
-                                    if (this.idAndHighlightMap[note.id]) {
-                                        this.idAndHighlightMap[note.id].forEach(highlight => {
-                                            note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
-                                        });
-                                        note.searchHighlight += '<hr>';
-                                    }
-                                });
+                    if (this.isResetCondition) {
+                        this.notes = noteList;
+                        this.isResetCondition = false;
+                    } else {
+                        this.notes = this.notes.concat(noteList);
+                    }
+                    if (noteList.length <= 0) {
+                        this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                    }
 
-                                if (this.isResetCondition) {
-                                    this.notes = noteList;
-                                    this.isResetCondition = false;
-                                } else {
-                                    this.notes = this.notes.concat(noteList);
-                                }
-                                if (res1.data.results.length <= 0) {
-                                    this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
-                                }
-                            }
-                        });
+                    // this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
+                    //     .subscribe((res1) => {
+                    //         if (res1 && res1.data && res1.data.results) {
+                    //             this.conditionCreateDate = '';
+                    //             const noteList = res1.data.results;
+                    //
+                    //             // 查询匹配后的高亮内容
+                    //             noteList.forEach(note => {
+                    //                 note.searchHighlight = '';
+                    //                 if (this.idAndHighlightMap[note.id]) {
+                    //                     this.idAndHighlightMap[note.id].forEach(highlight => {
+                    //                         note.searchHighlight += highlight.replace(/\<em\>/g, '<em style="color: red;">') + '<br>';
+                    //                     });
+                    //                     note.searchHighlight += '<hr>';
+                    //                 }
+                    //             });
+                    //
+                    //             if (this.isResetCondition) {
+                    //                 this.notes = noteList;
+                    //                 this.isResetCondition = false;
+                    //             } else {
+                    //                 this.notes = this.notes.concat(noteList);
+                    //             }
+                    //             if (res1.data.results.length <= 0) {
+                    //                 this.page.pageNo = this.page.pageNo > 1 ? this.page.pageNo - 1 : 1;
+                    //             }
+                    //         }
+                    //     });
+                } else {
+                    this.haveMore = false;
                 }
             }
         });
@@ -241,6 +287,10 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param username 用户名
      */
     conditionUser(username?: string): void {
+        if (this.searchKey) {
+            return;
+        }
+
         if (this.conditionUserName !== username || !username) {
             this.isResetCondition = true;
         }
@@ -254,6 +304,10 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
      * @param tagId 标签ID
      */
     conditionTag(tagId?: number): void {
+        if (this.searchKey) {
+            return;
+        }
+
         const tagsLen = this.conditionTags.length;
         if (!tagId) {
             this.conditionTags = [];
@@ -281,6 +335,14 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.noteTags = res.data.results;
             }
         });
+    }
+
+    /**
+     * 分页获取笔记
+     */
+    getMoreNote(): void {
+        this.page.pageNo = (this.page.pageNo || 0) + 1;
+        this.getList();
     }
 
 }

@@ -10,6 +10,6 @@ export class DynamicHtmlPipe implements PipeTransform {
     }
 
     transform(html) {
-        return this.sanitized.bypassSecurityTrustHtml(html);
+        return html ? this.sanitized.bypassSecurityTrustHtml(html) : null;
     }
 }

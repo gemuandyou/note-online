@@ -3,3 +3,19 @@
   width: calc(80% - 50px);
   margin: 10px 20px 0 calc(20% + 40px);
 }
+
+.page-more {
+  font-size: 12px;
+  font-style: italic;
+  color: #3c8ada;
+  font-weight: bolder;
+  cursor: pointer;
+  text-align: center;
+  background-color: rgba(216, 216, 216, 0.58);
+  padding: 6px 0;
+  border-radius: 5px 5px 0 0;
+}
+
+.page-more p {
+  margin: 0;
+}

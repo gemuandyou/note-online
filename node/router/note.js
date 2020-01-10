@@ -11,10 +11,10 @@ module.exports = function (app) {
     app.post('/note/search', (req, res) => {
         let esQuery = {
             "_source": {
-                "includes": [ "id", "note_title", "note_content" ],
+                "includes": [ "id", "note_title", "note_introduction", "note_content", "author", "create_date" ],
                 "excludes": []
             },
-            "size": 20,
+            "size": 10,
             "from": 0,
             "sort": {
                 "_score": {
