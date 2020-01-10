@@ -198,7 +198,9 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.esSearchAfter = [lastRecord._score, lastRecord._id];
 
                     res.data.results.map(doc => {
-                        this.idAndHighlightMap[doc._source.id] = doc.highlight.note_content;
+                        if (doc.highlight && doc.highlight.note_content) {
+                            this.idAndHighlightMap[doc._source.id] = doc.highlight.note_content;
+                        }
                     });
 
                     this.noteService.allMdsByIds(res.data.results.map(doc => doc._source.id))
