@@ -222,6 +222,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
                         const note = {
                             id: esNote['id'],
                             noteTitle: esNote['note_title'],
+                            noteUrl: esNote['note_url'],
                             noteIntroduction: esNote['note_introduction'],
                             noteContent: esNote['note_content'],
                             author: esNote['author'],

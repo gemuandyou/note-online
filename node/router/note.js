@@ -11,7 +11,7 @@ module.exports = function (app) {
     app.post('/note/search', (req, res) => {
         let esQuery = {
             "_source": {
-                "includes": [ "id", "note_title", "note_introduction", "note_content", "author", "create_date" ],
+                "includes": [ "id", "note_title", "note_url", "note_introduction", "note_content", "author", "create_date" ],
                 "excludes": []
             },
             "size": 10,
