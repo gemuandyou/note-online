@@ -15,6 +15,10 @@
   border-radius: 5px 5px 0 0;
 }
 
+.page-more:hover {
+  box-shadow: 2px 2px 10px grey;
+}
+
 .page-more p {
   margin: 0;
 }
