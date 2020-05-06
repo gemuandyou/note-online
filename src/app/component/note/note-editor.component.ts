@@ -9,6 +9,8 @@ import { Cookie } from '../../util/cookie';
 import { ModalBoxComponent } from '../modalbox/modalbox.component';
 import { Note } from './note';
 import { Tag } from './tag';
+import 'codemirror/mode/markdown/markdown';
+// import * as CodeMirror from 'codemirror/lib/codemirror';
 
 @Component({
     selector: 'app-note-editor',
@@ -20,15 +22,18 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     title = 'note-editor';
 
-    @ViewChild('notesEditor') notesEditor;
+    // @ViewChild('notesEditor') notesEditor;
     @ViewChild('notesViewer') notesViewer;
     @ViewChild('addTag') addTag;
+    @ViewChild('codemirrorInstance') codemirror;
     hideViewer: boolean; // 是否隐藏预览
     hideEditor: boolean; // 是否隐藏编辑
-    notesEditorEle: any;
+    // notesEditorEle: any;
     notesViewerEle: any;
+    cmOptions: any; // codemirror 参数
     roll: RollUtil;
     srcDom: any; // 被拖动的DOM
+    noteContent: string; // 笔记内容
     // 笔记元数据
     noteId: number; // 笔记ID
     noteTitle: string; // 笔记标题
@@ -64,12 +69,12 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         this.currentNoteUrl = params['noteUrl'];
         this.noteTitle = decodeURIComponent(params['noteTitle']);
         this.notePublish = params['isme'] == 0;
-        this.notesEditorEle = this.notesEditor.nativeElement;
+        // this.notesEditorEle = this.notesEditor.nativeElement;
         // 加载笔记内容
         if (this.currentNoteUrl) { // 渲染编辑的内容
             this.noteService.readFromMd(this.currentNoteUrl, true).subscribe((res) => {
                 if (res.data) {
-                    this.notesEditorEle.innerText = res.data;
+                    this.noteContent = res.data;
                     this.noteService.renderToHtml(res.data).subscribe((res1) => {
                         this.notesViewerEle = this.notesViewer.nativeElement;
                         const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
@@ -85,7 +90,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             this.noteService.readFromMd(username + '-temp.md', false).subscribe((res) => {
                 if (res.data) {
-                    this.notesEditorEle.innerText = res.data;
+                    this.noteContent = res.data;
                     this.noteService.renderToHtml(res.data).subscribe((res1) => {
                         this.notesViewerEle = this.notesViewer.nativeElement;
                         const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
@@ -95,19 +100,37 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             });
         }
         // 监听粘贴事件
-        this.notesEditorEle.addEventListener('paste', (e) => {
-            const pasteItems = e.clipboardData.items;
-            this.pasteHandle(pasteItems);
-        });
+        // this.notesEditorEle.addEventListener('paste', (e) => {
+        //     const pasteItems = e.clipboardData.items;
+        //     this.pasteHandle(pasteItems);
+        // });
+
+        // codemirror 直接初始化
+        // var codeEditor = CodeMirror.fromTextArea(this.notesEditorEle, {
+        //   mode:'markdown',
+        //   theme:'monokai', //编辑器主题
+        //   extraKeys: {"Ctrl": "autocomplete"},//ctrl可以弹出选择项
+        //   lineNumbers: true//显示行号
+        // });
+        // ng2-codemirror 初始化
+        this.cmOptions = {
+            mode: 'markdown',
+            theme: 'eclipse',
+            styleActiveLine: true, // 当前行背景高亮
+            lineNumbers: true,
+            tabSize: 2
+        };
     }
 
     ngAfterViewInit(): void {
-        this.notesEditorEle = this.notesEditor.nativeElement;
+        // this.notesEditorEle = this.notesEditor.nativeElement;
         this.notesViewerEle = this.notesViewer.nativeElement;
 
         // 开启轮训，来保存文本到文件中
         // this.roll = new RollUtil(5000);
         // this.roll.start(this.saveTempNote, this);
+
+        this.codemirror.instance.setSize(null, '100%');
     }
 
     ngOnDestroy(): void {
@@ -152,21 +175,17 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     /**
      * 编辑器中内容变动
      * @param event 事件
+     * @deprecated
      */
     changeEdit(event): void {
-        let editor = this.notesEditorEle.innerText;
+        console.log(event);
+        let editor = this.noteContent;
         if (!editor) {
             return;
         }
 
         editor = this.commonCharConvertToMD(editor);
         this.saveTempNote(editor);
-
-        // 仅仅输入回车后才会执行下面的渲染HTML操作，这样是为了提高性能
-        // 不过这样需要在保存前输入一个回车，不然可能会影响预览的展示
-        if (13 != event.keyCode && event.key !== 'Enter') {
-            return;
-        }
 
         this.noteService.renderToHtml(editor).subscribe((res) => {
             const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
@@ -191,7 +210,18 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             }, 100);
         });
     }
-
+    /**
+     * 编辑内容获取到焦点
+     */
+    contentFocus(): void {
+        console.log('content have focus')
+    }
+    /**
+     * 编辑内容失去焦点
+     */
+    contentBlur(): void {
+        console.log('content have blur')
+    }
     /**
      * 通用字符转换为Markdown字符。<br>
      *     <ul>
@@ -227,7 +257,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     saveNote(): void {
         // TODO 渲染HTML后保存，这里为了性能，省略此步骤，只需在保存前在编辑中输入回车即可
 
-        let editor = this.notesEditorEle.innerText;
+        let editor = this.noteContent;
         editor = this.commonCharConvertToMD(editor);
         const username = decodeURI(Cookie.getCookie('un'));
         if (!editor || !username) {
@@ -461,7 +491,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 targetDom.innerHTML = ev.dataTransfer.getData('text/plain');
                 const ele = this.elementRef.nativeElement;
                 const viewer: HTMLDivElement = ele.querySelectorAll('.viewer').item(0);
-                const editor: HTMLDivElement = ele.querySelectorAll('.editor').item(0);
+                // const editor: HTMLDivElement = ele.querySelectorAll('.editor').item(0);
+                const codeMirrorEle: HTMLDivElement = ele.querySelectorAll('.CodeMirror').item(0);
                 const content: HTMLDivElement = ele.querySelectorAll('.content').item(0);
                 if (targetDom.getAttribute('class')) {
                     if (targetDom.getAttribute('class').indexOf('viewer-top') !== -1) { // viewer on top
@@ -473,9 +504,11 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                         viewer.style.padding = '10px 10px 0 10px';
                         viewer.style.overflow = 'auto';
                         // editor style
-                        editor.style.width = 'calc(100% - 20px)';
-                        editor.style.height = 'calc(50% - 30px)';
-                        editor.style.overflow = 'auto';
+                        // editor.style.width = 'calc(100% - 20px)';
+                        // editor.style.height = 'calc(50% - 30px)';
+                        // editor.style.overflow = 'auto';
+                        this.codemirror.instance.setSize(null, '50%');
+                        codeMirrorEle.style.marginTop = 'calc(50% - 80px)';
                     }
                     if (targetDom.getAttribute('class').indexOf('viewer-left') !== -1) { // viewr on left
                         // content style
@@ -488,22 +521,26 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                         viewer.style.overflow = '';
                         viewer.style.setProperty('float', 'left');
                         // editor style
-                        editor.style.width = 'calc(50% - 30px)';
-                        editor.style.height = '';
-                        editor.style.minHeight = '100px';
-                        editor.style.overflow = '';
-                        editor.style.setProperty('float', 'left');
+                        // editor.style.width = 'calc(50% - 30px)';
+                        // editor.style.height = '';
+                        // editor.style.minHeight = '100px';
+                        // editor.style.overflow = '';
+                        // editor.style.setProperty('float', 'left');
+                        this.codemirror.instance.setSize(null, '100%');
+                        codeMirrorEle.style.marginTop = '0';
                     }
                     if (targetDom.getAttribute('class').indexOf('viewer-right') !== -1) { // viewer on right
                         // content style
                         content.style.height = '';
                         content.style.width = 'calc(100% - 130px)';
                         // editor style
-                        editor.style.width = 'calc(50% - 20px)';
-                        editor.style.height = '';
-                        editor.style.padding = '10px 10px 0 10px';
-                        editor.style.overflow = '';
-                        editor.style.setProperty('float', 'right');
+                        // editor.style.width = 'calc(50% - 20px)';
+                        // editor.style.height = '';
+                        // editor.style.padding = '10px 10px 0 10px';
+                        // editor.style.overflow = '';
+                        // editor.style.setProperty('float', 'right');
+                        this.codemirror.instance.setSize(null, '100%');
+                        codeMirrorEle.style.marginTop = '0';
                         // viewer style
                         viewer.style.width = 'calc(50% - 30px)';
                         viewer.style.height = '';

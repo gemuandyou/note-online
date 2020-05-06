@@ -51,8 +51,15 @@
   <div class="content">
     <div class="viewer" #notesViewer [ngClass]="{'hidden': hideViewer, 'width-full': hideEditor}">
     </div>
-    <div class="editor" contenteditable="plaintext-only" #notesEditor (keyup)="changeEdit($event)" [ngClass]="{'hidden': hideEditor, 'width-full': hideViewer}">
-    </div>
+<!--    <div class="editor" contenteditable="plaintext-only" #notesEditor (keyup)="changeEdit($event)">-->
+<!--    </div>-->
+    <codemirror #codemirrorInstance
+            [(ngModel)]="noteContent"
+            [config]="cmOptions" 
+            (change)="changeEdit($event)"
+            (focus)="contentFocus()"
+            (blur)="contentBlur()">
+    </codemirror>
   </div>
 
   <!-- 保存弹出框 -->

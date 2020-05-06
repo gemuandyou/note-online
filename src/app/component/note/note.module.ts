@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CodemirrorModule } from 'ng2-codemirror';
 import { ModalBoxModule } from '../modalbox/modalbox.module';
 import { NoteListComponent } from './note-list.component';
 import { NoteEditorComponent } from './note-editor.component';
@@ -49,7 +50,8 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     ModalBoxModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    CodemirrorModule
   ]
 })
 export class NoteModule {}
