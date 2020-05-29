@@ -19,9 +19,6 @@ module.exports = function (app) {
             "sort": {
                 "_score": {
                     "order": "desc"
-                },
-                "_id": {
-                    "order": "asc"
                 }
             },
             "query": {
@@ -53,7 +50,7 @@ module.exports = function (app) {
         if (req.body.esSearchAfter && req.body.esSearchAfter.length > 0) {
             esQuery["search_after"] = req.body.esSearchAfter;
         }
-        es.searchNote(esQuery, (result) => {
+        es.searchNote(JSON.stringify(esQuery), (result) => {
             if (result && result.hits && result.hits.total > 0) {
                 res.json({
                     'data': {
