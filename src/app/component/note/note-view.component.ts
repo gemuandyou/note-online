@@ -67,7 +67,7 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.noteService.renderToHtml(res.data).subscribe((res1) => {
                         this.notesViewerEle = this.notesViewer.nativeElement;
                         const style = '<link rel="stylesheet" href="assets/style/markdown.css">';
-                        this.notesViewerEle.innerHTML = res1.data + style;
+                        this.notesViewerEle.innerHTML = res1.data.replaceAll('<a href', '<a target="_blank" href') + style;
                         // 生成预览
                         const parseStructure = new ParseStructure();
                         this.previewStructures = parseStructure.parseStructure(this.notesViewer.nativeElement);
