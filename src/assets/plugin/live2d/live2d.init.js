@@ -1,8 +1,8 @@
 L2Dwidget.init({
     "display": {
         "superSample": 2,
-        "width": 200,
-        "height": 400,
+        "width": 120,
+        "height": 240,
         "position": "right",
         "hOffset": 0,
         "vOffset": 0
