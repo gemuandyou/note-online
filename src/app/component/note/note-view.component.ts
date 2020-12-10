@@ -80,10 +80,16 @@ export class NoteViewComponent implements OnInit, AfterViewInit, OnDestroy {
     ngAfterViewInit(): void {
         window.addEventListener('scroll', (ev) => {
             this.activeNum = -1;
+            let idx = -1;
             this.previewStructures.forEach(preview => {
+                idx++;
                 if (preview && preview.dom && (preview.dom.offsetTop - 60) < window.scrollY) {
                     this.activeNum++;
-                    console.count('遍历预览标题，显示高亮');
+                    let previewLiDom = document.getElementsByClassName('note-preview-li-' + idx);
+                    if (previewLiDom && previewLiDom[0]) {
+                        previewLiDom[0].scrollIntoView(false);
+                    }
+                    // console.count('遍历预览标题，显示高亮');
                 } else {
                     return;
                 }
