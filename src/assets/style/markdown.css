@@ -91,30 +91,33 @@
 
 .viewer h1 {
   font-size: 28px;
-  color: black;
+  color: #b78080 !important;
 }
 
 .viewer h2 {
   font-size: 24px;
   border-bottom: 1px solid #cccccc;
-  color: black;
+  color: #a2b780 !important;
 }
 
 .viewer h3 {
   font-size: 18px;
+  color: #8eafb7 !important;
 }
 
 .viewer h4 {
   font-size: 16px;
+  color: #41c6cd !important;
 }
 
 .viewer h5 {
   font-size: 14px;
+  color: #8081b7 !important;
 }
 
 .viewer h6 {
-  color: #777777;
   font-size: 14px;
+  color: #b7a480 !important;
 }
 
 .viewer p,
