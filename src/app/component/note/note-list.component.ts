@@ -33,6 +33,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     conditionCreateDate: string;
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
     searchKey: string; // 搜索条件
+    nativeSearch: boolean; // 强制从MySQL数据库搜索
     isPc: boolean = true; // 是否是PC端
     calendar: GMCalendar;
     esSearchAfter: string[] = []; // ES搜索分页的最后一条数据标识
@@ -58,6 +59,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         let params = this.activateRoute.params['value'];
         this.searchKey = SignUtil.decodingUrlSign(params['searchKey']);
+        this.nativeSearch = params['native'] == '' || params['native'] == 'true';
         this.getList();
         this.getTags();
         this.userService.userList().subscribe((res) => {
@@ -154,7 +156,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (createDate) {
             this.conditionCreateDate = createDate;
         }
-        if (this.searchKey) {
+        if (this.searchKey && !this.nativeSearch) {
             this.getListFromES();
         } else {
             this.getListFromMySQL();
