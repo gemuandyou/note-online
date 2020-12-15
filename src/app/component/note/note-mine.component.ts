@@ -28,6 +28,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
     conditionTags: number[] = [];
     isResetCondition: boolean = false; // 是否重新获取笔记列表分页数据，而不是累加分页的数据
     calendar: GMCalendar;
+    haveMore: boolean = true;
 
     constructor(private noteService: NoteService, private userService: UserService, private tagService: TagService,
         private router: Router) {
@@ -119,6 +120,7 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
     getList(): void {
         this.noteService.listByAuthorFromMysql(this.username, this.conditionTags, this.conditionDateField, this.page).subscribe((res) => {
             if (res && res.data && res.data.results) {
+                this.haveMore = res.data.results.length == this.page.pageSize;
                 if (this.isResetCondition) {
                     this.notes = res.data.results;
                     this.isResetCondition = false;
@@ -191,6 +193,14 @@ export class NoteMineComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.noteTags = res.data.results;
             }
         });
+    }
+
+    /**
+     * 分页获取笔记
+     */
+    getMoreNote(): void {
+        this.page.pageNo = (this.page.pageNo || 0) + 1;
+        this.getList();
     }
 
 }

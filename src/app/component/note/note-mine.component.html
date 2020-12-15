@@ -24,6 +24,7 @@
       <div class="module-title">{{note.noteTitle}}</div>
       <div class="module-introduction">{{note.noteIntroduction}}</div>
     </div>
+    <div class="page-more" (click)="getMoreNote()"><p *ngIf="haveMore">获取更多的秘密</p><p *ngIf="!haveMore">没有数据了</p></div>
   </div>
 
 </div>

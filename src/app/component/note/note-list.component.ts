@@ -176,7 +176,7 @@ export class NoteListComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe((res) => {
             if (res && res.data && res.data.results) {
                 this.conditionCreateDate = '';
-                this.haveMore = res.data.results.length > 0;
+                this.haveMore = res.data.results.length == this.page.pageSize;
                 if (this.isResetCondition) {
                     this.notes = res.data.results;
                     this.isResetCondition = false;
