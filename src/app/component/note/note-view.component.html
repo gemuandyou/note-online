@@ -14,7 +14,7 @@
   <ul>
     <li *ngFor="let struct of previewStructures; let i=index" (click)="positionPreview(struct.dom);" class="space-{{struct.tier}} note-preview-li-{{i}}" [ngClass]="{'preview-active': i == activeNum}">
       <!-- <span retract="{{struct.tier}}"></span>  -->
-      {{struct.name}}
+      <span class="preview-content-span">{{struct.name}}</span>
     </li>
   </ul>
 </div>

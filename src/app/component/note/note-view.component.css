@@ -63,10 +63,20 @@
   font-weight: bold;
 }
 
+.preview-content-span {
+  border-left: 2px solid transparent;
+  display: block;
+  padding-left: 3px;
+}
+
 .preview-active {
-  color: #c74d00;
+  color: #007eaf;
   cursor: pointer;
   font-weight: bold;
+}
+
+.preview-active span {
+  border-left: 2px solid black;
 }
 
 .space-0 {
