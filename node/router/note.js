@@ -51,10 +51,10 @@ module.exports = function (app) {
             esQuery["search_after"] = req.body.esSearchAfter;
         }
         es.searchNote(JSON.stringify(esQuery), (result) => {
-            if (result && result.hits && result.hits.total > 0) {
+            if (result && result.body && result.body.hits && result.body.hits.total.value > 0) {
                 res.json({
                     'data': {
-                        'results': result.hits.hits
+                        'results': result.body.hits.hits
                     }
                 });
             } else if (result) {

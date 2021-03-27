@@ -5,13 +5,14 @@ module.exports = {
         console.log(query);
         client.search({
             index: 'note-online',
-            type: 'note',
             body: query
-        }).then(function(result) {
-            callback(result);
-        }, function(error) {
-            console.log(error);
-            callback();
+        }, (err, result) => {
+            if (err) {
+                console.log(err)
+                callback();
+            } else {
+                callback(result);
+            }
         });
     }
 }
