@@ -178,7 +178,7 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
      * @deprecated
      */
     changeEdit(event): void {
-        console.log(event);
+        // console.log(event);
         let editor = this.noteContent;
         if (!editor) {
             return;
@@ -271,11 +271,21 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             const noteIntroduction = this.notesViewer.nativeElement.innerText.substring(0, 100) + '...';
             if (this.currentNoteUrl) { // 更新笔记
                 this.noteService.modifyToMysql(this.noteTitle, res.data, noteIntroduction, editor, username).subscribe((res1) => {
-                    console.log(res1);
+                    if (res1.data) {
+                        let headerTip:HTMLElement = <HTMLElement>document.getElementsByClassName('header-tip')[0];
+                        let originalText = headerTip.innerText;
+                        headerTip.innerText = '笔记更新成功';
+                        setTimeout(() => {headerTip.innerText = originalText}, 3000);
+                    }
                 });
             } else { // 添加笔记
                 this.noteService.saveToMysql(this.noteTitle, res.data, noteIntroduction, editor, username).subscribe((res1) => {
-                    console.log(res1);
+                    if (res1.data) {
+                        let headerTip:HTMLElement = <HTMLElement>document.getElementsByClassName('header-tip')[0];
+                        let originalText = headerTip.innerText;
+                        headerTip.innerText = '笔记添加成功';
+                        setTimeout(() => {headerTip.innerText = originalText}, 3000);
+                    }
                 });
             }
         });

@@ -65,8 +65,8 @@ export class ModalBoxComponent implements OnInit, AfterViewInit, OnDestroy {
    * 确认
    */
   confirmModal(): void {
-    this.closeModal();
     this.confirmEvent.emit();
+    this.closeModal();
   }
 
   /**
