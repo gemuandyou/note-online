@@ -274,8 +274,12 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                     if (res1.data) {
                         let headerTip:HTMLElement = <HTMLElement>document.getElementsByClassName('header-tip')[0];
                         let originalText = headerTip.innerText;
+                        headerTip.style.color = 'yellow';
                         headerTip.innerText = '笔记更新成功';
-                        setTimeout(() => {headerTip.innerText = originalText}, 3000);
+                        setTimeout(() => {
+                            headerTip.innerText = originalText;
+                            headerTip.style.color = '#ECECEC';
+                        }, 3000);
                     }
                 });
             } else { // 添加笔记
@@ -283,8 +287,12 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
                     if (res1.data) {
                         let headerTip:HTMLElement = <HTMLElement>document.getElementsByClassName('header-tip')[0];
                         let originalText = headerTip.innerText;
+                        headerTip.style.color = 'yellow';
                         headerTip.innerText = '笔记添加成功';
-                        setTimeout(() => {headerTip.innerText = originalText}, 3000);
+                        setTimeout(() => {
+                            headerTip.innerText = originalText; 
+                            headerTip.style.color = '#ECECEC';
+                        }, 3000);
                     }
                 });
             }
