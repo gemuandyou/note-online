@@ -227,6 +227,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
      *     <ul>
      *         <li>· => `</li>
      *         <li>、[回车] => \[回车]</li>
+     *         <li>。。 => &nbsp;</li>
+     *         <li>.. => &nbsp;</li>
      *     </ul>
      * @param content
      */
@@ -237,6 +239,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         content = content.replace(/、\n/g, '\\\n');
         // “..”字符串转为“&nbsp;&nbsp;&nbsp;&nbsp;”
         content = content.replace(/\.\./g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+        // “。。”字符串转为“&nbsp;&nbsp;&nbsp;&nbsp;”
+        content = content.replace(/。。/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
         return content;
     }
 
