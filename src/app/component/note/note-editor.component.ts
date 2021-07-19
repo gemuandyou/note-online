@@ -235,6 +235,8 @@ export class NoteEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         content = content.replace(/·/g, '`');
         // 中文的“、[回车]”字符串转为“\[回车]”
         content = content.replace(/、\n/g, '\\\n');
+        // “..”字符串转为“&nbsp;&nbsp;&nbsp;&nbsp;”
+        content = content.replace(/\.\./g, '&nbsp;&nbsp;&nbsp;&nbsp;');
         return content;
     }
 
