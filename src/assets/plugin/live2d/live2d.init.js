@@ -5,7 +5,7 @@ L2Dwidget.init({
         "height": 240,
         "position": "right",
         "hOffset": 0,
-        "vOffset": 0
+        "vOffset": 310
     },
     "model": { 
         "jsonPath": "assets/plugin/live2d/umaru/model.json", 
